@@ -33,7 +33,7 @@ namespace DivaHook::Components
 	static int fps_limit = 0;
 	static int sfx_volume = 100;
 	static int bgm_volume = 100;
-	static float ui_transparency = 50;
+	static float ui_transparency = 0.8;
 	static float sleep = 0;
 	static float fpsdiff = 0;
 
@@ -100,7 +100,7 @@ namespace DivaHook::Components
 
 		if (showfps)
 		{
-			ImGui::SetNextWindowBgAlpha(0.75f);
+			ImGui::SetNextWindowBgAlpha(ui_transparency);
 			ImGuiWindowFlags window_flags = 0;
 			window_flags |= ImGuiWindowFlags_NoMove;
 			window_flags |= ImGuiWindowFlags_NoResize;
@@ -114,6 +114,7 @@ namespace DivaHook::Components
 		}
 
 		if (showui) {
+			ImGui::SetNextWindowBgAlpha(ui_transparency);
 			ImGui::Begin("DivaHook Config");
 			ImGui::Text("Changes only takes effect after entering a new stage.");
 			ImGui::Text("--- Modules and Custom Skins/Sounds ---");
