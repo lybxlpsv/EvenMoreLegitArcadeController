@@ -25,7 +25,12 @@ namespace DivaHook::Components
 	static int BtnSeEquip = 0;
 	static int Skinequip = 0;
 	static bool showui = false;
+	static bool showfps = true;
 	static int firsttime = 5000;
+	static int fps_limit = 0;
+	static int sfx_volume = 100;
+	static int bgm_volume = 100;
+	static int ui_transparency = 50;
 	
 	PlayerDataManager* pdm;
 
@@ -81,16 +86,42 @@ namespace DivaHook::Components
 			ImGui::End();
 		}
 
+		if (showfps)
+		{
+			ImGui::Begin("FPS/ms");
+			ImGui::Text("Framerate: %.1FPS", ImGui::GetIO().Framerate);
+			ImGui::Text("Frametime: %.3fms", 1000.0f / ImGui::GetIO().Framerate);
+			ImGui::SetWindowPos(ImVec2(1000, 0));
+		}
+
 		if (showui) {
-			ImGui::Begin("DIVA");
+			ImGui::Begin("DivaHook Config");
 			ImGui::Text("Changes only takes effect after entering a new stage.");
-			ImGui::InputInt("ModuleEquip1", &ModuleEquip1);
-			ImGui::InputInt("ModuleEquip2", &ModuleEquip2);
-			ImGui::InputInt("btnSeEquip", &BtnSeEquip);
-			ImGui::InputInt("SkinEquip", &Skinequip);
-			ImGui::InputInt("RenderResWidth", fbWidth);
-			ImGui::InputInt("RenderResHeight", fbHeight);
+			ImGui::Text("--- Modules and Custom Skins/Sounds ---");
+			ImGui::InputInt("Module 1 ID", &ModuleEquip1);
+			ImGui::InputInt("Module 2 ID", &ModuleEquip2);
+			ImGui::InputInt("Button SFX ID", &BtnSeEquip);
+			ImGui::InputInt("HUD Skin ID", &Skinequip);
+			ImGui::Text("--- Internal Resolution ---");
+			ImGui::SliderInt("Resolution Width", fbWidth, 640, 2560);
+			ImGui::SliderInt("Resolution Height", fbHeight, 360, 1440);
+			ImGui::Text("--- Framerate ---");
+			ImGui::InputInt("Framerate Cap", &fps_limit);
+			ImGui::Text("--- Sound Settings ---");
+			ImGui::SliderInt("BGM Volume", &bgm_volume, 0, 100);
+			ImGui::SliderInt("SFX Volume", &sfx_volume, 0, 100);
+			ImGui::Text("--- UI Settings ---");
+			ImGui::SliderInt("UI Transparency", &ui_transparency, 0, 100);
+			ImGui::Checkbox("Framerate Overlay", &showfps);
+			if (ImGui::Button("Save"))
+			{
+				// do stuff
+			}
 			ImGui::End();
+		}
+		else
+		{
+
 		}
 		// Rendering
 		ImGui::Render();
