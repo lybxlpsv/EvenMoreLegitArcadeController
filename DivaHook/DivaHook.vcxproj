@@ -150,7 +150,7 @@
     <ClInclude Include="src\FileSystem\TextFile.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\imgui-master\imgui-master\examples\libs\gl3w\GL\gl3w.c" />
+    <ClCompile Include="..\deps\GL\gl3w.c" />
     <ClCompile Include="..\deps\imgui\imgui.cpp" />
     <ClCompile Include="..\deps\imgui\imgui_demo.cpp" />
     <ClCompile Include="..\deps\imgui\imgui_draw.cpp" />
