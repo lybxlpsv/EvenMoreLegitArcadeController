@@ -16,10 +16,15 @@ namespace DivaHook::Components
 
 		virtual void Initialize() override;
 		virtual void Update() override;
+		CustomPlayerData* customPlayerData;
+		PlayerData* playerData;
+		int ModuleEquip1 = 0;
+		int ModuleEquip2 = 0;
+		int SkinEquip = 0;
+		int BtnSeEquip = 0;
 
 	private:
-		PlayerData* playerData;
-		CustomPlayerData* customPlayerData;
+		
 
 		void LoadConfig();
 	};

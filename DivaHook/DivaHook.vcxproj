@@ -48,12 +48,14 @@
     <TargetName>divahook</TargetName>
     <OutDir>$(SolutionDir)bin\$(Platform)-$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(ProjectName)\bin-int\$(Platform)-$(Configuration)\</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)deps\</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>divahook</TargetName>
     <OutDir>$(SolutionDir)bin\$(Platform)-$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(ProjectName)\bin-int\$(Platform)-$(Configuration)\</IntDir>
+    <IncludePath>$(SolutionDir)deps\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -69,6 +71,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -89,15 +92,30 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\imgui-master\imgui-master\examples\libs\gl3w\GL\gl3w.h" />
+    <ClInclude Include="..\..\imgui-master\imgui-master\examples\libs\gl3w\GL\glcorearb.h" />
+    <ClInclude Include="..\deps\imgui\imconfig.h" />
+    <ClInclude Include="..\deps\imgui\imgui.h" />
+    <ClInclude Include="..\deps\imgui\imgui_impl_opengl2.h" />
+    <ClInclude Include="..\deps\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\deps\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="..\deps\imgui\imgui_internal.h" />
+    <ClInclude Include="..\deps\imgui\imstb_rectpack.h" />
+    <ClInclude Include="..\deps\imgui\imstb_textedit.h" />
+    <ClInclude Include="..\deps\imgui\imstb_truetype.h" />
     <ClInclude Include="src\Components\CustomPlayerData.h" />
     <ClInclude Include="src\Components\Camera.h" />
     <ClInclude Include="src\Components\CameraController.h" />
     <ClInclude Include="src\Components\FrameRateManager.h" />
-    <ClInclude Include="src\Components\ScaleComponent.h" />
+    <ClInclude Include="src\Components\GLComponent.h" />
+    <ClInclude Include="src\Components\GLMemory.h" />
     <ClInclude Include="src\Components\PlayerDataManager.h" />
+    <ClInclude Include="src\Components\ScaleComponent.h" />
+    <ClInclude Include="src\deps\imgui\imconfig.h" />
     <ClInclude Include="src\FileSystem\ConfigFile.h" />
     <ClInclude Include="src\Components\DebugComponent.h" />
     <ClInclude Include="src\Components\GameState.h" />
@@ -132,11 +150,20 @@
     <ClInclude Include="src\FileSystem\TextFile.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\imgui-master\imgui-master\examples\libs\gl3w\GL\gl3w.c" />
+    <ClCompile Include="..\deps\imgui\imgui.cpp" />
+    <ClCompile Include="..\deps\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\deps\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\deps\imgui\imgui_impl_opengl2.cpp" />
+    <ClCompile Include="..\deps\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\deps\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="..\deps\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Components\CustomPlayerData.cpp" />
     <ClCompile Include="src\Components\CameraController.cpp" />
     <ClCompile Include="src\Components\FrameRateManager.cpp" />
-    <ClCompile Include="src\Components\ScaleComponent.cpp" />
+    <ClCompile Include="src\Components\GLComponent.cpp" />
     <ClCompile Include="src\Components\PlayerDataManager.cpp" />
+    <ClCompile Include="src\Components\ScaleComponent.cpp" />
     <ClCompile Include="src\FileSystem\ConfigFile.cpp" />
     <ClCompile Include="src\Components\DebugComponent.cpp" />
     <ClCompile Include="src\Components\PlayerData.h" />
