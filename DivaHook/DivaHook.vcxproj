@@ -96,8 +96,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\imgui-master\imgui-master\examples\libs\gl3w\GL\gl3w.h" />
-    <ClInclude Include="..\..\imgui-master\imgui-master\examples\libs\gl3w\GL\glcorearb.h" />
+    <ClInclude Include="..\deps\imgui\GL\gl3w.h" />
+    <ClInclude Include="..\deps\imgui\GL\glcorearb.h" />
     <ClInclude Include="..\deps\imgui\imconfig.h" />
     <ClInclude Include="..\deps\imgui\imgui.h" />
     <ClInclude Include="..\deps\imgui\imgui_impl_opengl2.h" />
