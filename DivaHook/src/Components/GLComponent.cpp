@@ -90,8 +90,6 @@ namespace DivaHook::Components
 			ImGui::InputInt("SkinEquip", &Skinequip);
 			ImGui::InputInt("RenderResWidth", fbWidth);
 			ImGui::InputInt("RenderResHeight", fbHeight);
-			if (pdm->playerData->level_name != NULL)
-				ImGui::Text(pdm->playerData->level_name);
 			ImGui::End();
 		}
 		// Rendering
@@ -104,14 +102,14 @@ namespace DivaHook::Components
 	void __declspec(naked) SwapTrampoline()
 	{
 		__asm {
-			PUSHFD                                    //Stores EFLAGS
-			PUSHAD                                   //Stores GP Registers
-			CALL hwglSwapBuffers         //Redirects the execution to our function
+			PUSHFD										//Stores EFLAGS
+			PUSHAD										//Stores GP Registers
+			CALL hwglSwapBuffers						//Redirects the execution to our function
 			POPAD                                       //Restores GP Registers
 			POPFD                                       //Restores EFLAGS
-			PUSH EBP                                 //Restores Overwritten PUSH EBP
-			MOV EBP, ESP                          //Restores Overwritten MOV  EBP, ESP
-			JMP[owglSwapBuffers]         //Restores the execution to the original function
+			PUSH EBP									//Restores Overwritten PUSH EBP
+			MOV EBP, ESP								//Restores Overwritten MOV  EBP, ESP
+			JMP[owglSwapBuffers]						//Restores the execution to the original function
 		}
 	}
 
@@ -150,7 +148,7 @@ namespace DivaHook::Components
 		pdm->customPlayerData->SkinEquip = Skinequip;
 		pdm->Update();
 		if (firsttime > 0) firsttime = firsttime - round(GetElapsedTime());
-		//fps = 1000 / GetElapsedTime();
+		//fps = 1000 / GetElapsedTime(); this takes alot of cpu :(
 		return;
 	}
 
