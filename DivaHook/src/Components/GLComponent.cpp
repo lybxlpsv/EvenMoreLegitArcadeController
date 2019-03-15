@@ -13,6 +13,9 @@
 #include "PlayerDataManager.h"
 #include "../Components/EmulatorComponent.h"
 
+#include <chrono>
+#include <thread>
+
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_opengl2.h"
 #include "imgui/imgui_impl_win32.h"
@@ -30,8 +33,10 @@ namespace DivaHook::Components
 	static int fps_limit = 0;
 	static int sfx_volume = 100;
 	static int bgm_volume = 100;
-	static int ui_transparency = 50;
-	
+	static float ui_transparency = 50;
+	static float sleep = 0;
+	static float fpsdiff = 0;
+
 	PlayerDataManager* pdm;
 
 	GLComponent::GLComponent()
@@ -73,14 +78,21 @@ namespace DivaHook::Components
 			}
 			i++;
 		}
-		
+
+		bool p_open = true;
+		RECT hWindow;
+		GetClientRect(DivaHook::MainModule::DivaWindowHandle, &hWindow);
+
 		ImGui_ImplWin32_NewFrame();
 		ImGui_ImplOpenGL2_NewFrame();
 		ImGui::NewFrame();
 
 		if (firsttime > 0)
 		{
-			ImGui::Begin("ELAC");
+			ImGuiWindowFlags window_flags = 0;
+			window_flags |= ImGuiWindowFlags_NoMove;
+			window_flags |= ImGuiWindowFlags_NoResize;
+			ImGui::Begin("ELAC", &p_open, window_flags);
 			ImGui::SetWindowPos(ImVec2(0, 0));
 			ImGui::Text("Press Ctrl+LShift+Backspace to show/hide UI.");
 			ImGui::End();
@@ -88,10 +100,17 @@ namespace DivaHook::Components
 
 		if (showfps)
 		{
-			ImGui::Begin("FPS/ms");
-			ImGui::Text("Framerate: %.1FPS", ImGui::GetIO().Framerate);
-			ImGui::Text("Frametime: %.3fms", 1000.0f / ImGui::GetIO().Framerate);
-			ImGui::SetWindowPos(ImVec2(1000, 0));
+			ImGui::SetNextWindowBgAlpha(0.75f);
+			ImGuiWindowFlags window_flags = 0;
+			window_flags |= ImGuiWindowFlags_NoMove;
+			window_flags |= ImGuiWindowFlags_NoResize;
+			window_flags |= ImGuiWindowFlags_NoTitleBar;
+			ImGui::Begin("", &p_open, window_flags);
+			ImGui::SetWindowPos(ImVec2(hWindow.right - 100, 0));
+			ImGui::SetWindowSize(ImVec2(100, 70));
+			ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+			ImGui::Text("FT: %.1fms", 1000 / ImGui::GetIO().Framerate);
+			ImGui::Text("SLP: %.1fms", sleep);
 		}
 
 		if (showui) {
@@ -111,7 +130,7 @@ namespace DivaHook::Components
 			ImGui::SliderInt("BGM Volume", &bgm_volume, 0, 100);
 			ImGui::SliderInt("SFX Volume", &sfx_volume, 0, 100);
 			ImGui::Text("--- UI Settings ---");
-			ImGui::SliderInt("UI Transparency", &ui_transparency, 0, 100);
+			ImGui::SliderFloat("UI Transparency", &ui_transparency, 0, 1.0);
 			ImGui::Checkbox("Framerate Overlay", &showfps);
 			if (ImGui::Button("Save"))
 			{
@@ -126,6 +145,39 @@ namespace DivaHook::Components
 		// Rendering
 		ImGui::Render();
 		ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+
+		//The worst framelimit/pacer ever.
+		//TODO : Destroy this thing and replace with a much better one.
+
+		if (fpsdiff > 0)
+		{
+			if (fpsdiff > 4) sleep = sleep + 0.02f;
+			if (fpsdiff > 3) sleep = sleep + 0.01f;
+			if (fpsdiff > 2) sleep = sleep + 0.01f;
+			if (fpsdiff > 1) sleep = sleep + 0.0075f;
+			if (fpsdiff > 0.5) sleep = sleep + 0.005f;
+			sleep = sleep + 0.005f;
+		}
+		else {
+			if (sleep > 0) {
+				if (fpsdiff < -4) sleep = sleep - 0.02f;
+				if (fpsdiff < -3) sleep = sleep - 0.01f;
+				if (fpsdiff < -2) sleep = sleep - 0.01f;
+				if (fpsdiff < -1) sleep = sleep - 0.0075f;
+				if (fpsdiff < -0.5) sleep = sleep - 0.005f;
+				sleep = sleep - 0.005f;
+			}
+			else sleep = 0;
+		}
+
+		fpsdiff = (1000 / (float)fps_limit) - (1000 / ImGui::GetIO().Framerate);
+		if (fps_limit > 30)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds((int)sleep));
+			
+		}
+		else sleep = 0;
+
 		return;
 	}
 
@@ -167,10 +219,10 @@ namespace DivaHook::Components
 		ImGui_ImplWin32_Init(MainModule::DivaWindowHandle);
 		ImGui_ImplOpenGL2_Init();
 		ImGui::StyleColorsDark();
-		
+
 		printf("GLComponent::Initialize(): Initialized\n");
 	}
-	
+
 	void GLComponent::Update()
 	{
 		pdm->customPlayerData->ModuleEquip[0] = ModuleEquip1;
