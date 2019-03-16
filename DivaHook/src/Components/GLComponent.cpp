@@ -129,6 +129,8 @@ namespace DivaHook::Components
 			window_flags |= ImGuiWindowFlags_NoResize;
 			window_flags |= ImGuiWindowFlags_NoCollapse;
 			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+			io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 			ImGui::Begin("DivaHook Config", &p_open, window_flags);
 			ImGui::Text("Changes only takes effect after entering a new stage.");
 			ImGui::Text("--- Modules and Custom Skins/Sounds ---");
