@@ -95,6 +95,9 @@ namespace DivaHook::Components
 			ImGuiWindowFlags window_flags = 0;
 			window_flags |= ImGuiWindowFlags_NoMove;
 			window_flags |= ImGuiWindowFlags_NoResize;
+			window_flags |= ImGuiWindowFlags_NoTitleBar;
+			window_flags |= ImGuiWindowFlags_NoCollapse;
+			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
 			ImGui::Begin("ELAC", &p_open, window_flags);
 			ImGui::SetWindowPos(ImVec2(0, 0));
 			ImGui::Text("Press Ctrl+LShift+Backspace to show/hide UI.");
@@ -108,6 +111,8 @@ namespace DivaHook::Components
 			window_flags |= ImGuiWindowFlags_NoMove;
 			window_flags |= ImGuiWindowFlags_NoResize;
 			window_flags |= ImGuiWindowFlags_NoTitleBar;
+			window_flags |= ImGuiWindowFlags_NoCollapse;
+			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
 			ImGui::Begin("", &p_open, window_flags);
 			ImGui::SetWindowPos(ImVec2(hWindow.right - 100, 0));
 			ImGui::SetWindowSize(ImVec2(100, 70));
@@ -116,9 +121,14 @@ namespace DivaHook::Components
 			ImGui::Text("SLP: %.1fms", sleep);
 		}
 
-		if (showui) {
+		if (showui)
+		{
 			ImGui::SetNextWindowBgAlpha(ui_transparency);
-			ImGui::Begin("DivaHook Config");
+			ImGuiWindowFlags window_flags = 0;
+			window_flags |= ImGuiWindowFlags_NoResize;
+			window_flags |= ImGuiWindowFlags_NoCollapse;
+			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+			ImGui::Begin("DivaHook Config", &p_open, window_flags);
 			ImGui::Text("Changes only takes effect after entering a new stage.");
 			ImGui::Text("--- Modules and Custom Skins/Sounds ---");
 			ImGui::InputInt("Module 1 ID", &ModuleEquip1);
