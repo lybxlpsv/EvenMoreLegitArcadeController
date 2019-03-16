@@ -39,7 +39,11 @@ namespace DivaHook::Components
 	static float sleep = 0;
 	static float fpsdiff = 0;
 	static bool MorphologicalAA = 0;
+	static bool MorphologicalAA2 = 0;
 	static bool TemporalAA = 0;
+
+	static bool ToonShader = true;
+	static bool ToonShader2 = false;
 
 	static int maxrenderwidth = 2560;
 	static int maxrenderheight = 1440;
@@ -124,6 +128,7 @@ namespace DivaHook::Components
 			ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 			ImGui::Text("FT: %.1fms", 1000 / ImGui::GetIO().Framerate);
 			ImGui::Text("SLP: %.1fms", sleep);
+			ImGui::End();
 		}
 
 		if (showabout)
@@ -145,6 +150,7 @@ namespace DivaHook::Components
 			ImGui::Text("DIVAHook UI Contributors:");
 			ImGui::Text("BesuBaru");
 			if (ImGui::Button("Close")) { showabout = false; };
+			ImGui::End();
 		}
 
 		if (showui) {
@@ -178,6 +184,7 @@ namespace DivaHook::Components
 				ImGui::Text("--- Anti-Aliasing ---");
 				ImGui::Checkbox("MLAA (Morphological AA)", &MorphologicalAA);
 				ImGui::Checkbox("TAA (Temporal AA)", &TemporalAA);
+				ImGui::Checkbox("Toon Shader (-hdtv1080/-aa)", &ToonShader);
 			}
 			if (ImGui::CollapsingHeader("Sound Settings"))
 			{
@@ -287,6 +294,71 @@ namespace DivaHook::Components
 
 	void GLComponent::Update()
 	{
+		int* taa;
+		taa = (int*)GFX_TEMPORAL_AA;
+		if (TemporalAA)
+		{
+			DWORD oldProtect, bck;
+			VirtualProtect((BYTE*)GFX_TEMPORAL_AA, 1, PAGE_EXECUTE_READWRITE, &oldProtect);
+			Memory::Write(GFX_TEMPORAL_AA, 0x01);
+			VirtualProtect((BYTE*)GFX_TEMPORAL_AA, 1, oldProtect, &bck);
+		}
+		else {
+			DWORD oldProtect, bck;
+			VirtualProtect((BYTE*)GFX_TEMPORAL_AA, 1, PAGE_EXECUTE_READWRITE, &oldProtect);
+			Memory::Write(GFX_TEMPORAL_AA, 0x00);
+			VirtualProtect((BYTE*)GFX_TEMPORAL_AA, 1, oldProtect, &bck);
+		}
+
+		if (MorphologicalAA)
+		{
+			if (!MorphologicalAA2) {
+				DWORD oldProtect, bck;
+				VirtualProtect((BYTE*)0x006EE6F8, 3, PAGE_EXECUTE_READWRITE, &oldProtect);
+				*((byte*)0x006EE6F8 + 0) = 0x85;
+				*((byte*)0x006EE6F8 + 1) = 0x45;
+				*((byte*)0x006EE6F8 + 2) = 0x10;
+				VirtualProtect((BYTE*)0x006EE6F8, 3, oldProtect, &bck);
+				MorphologicalAA2 = true;
+			}
+		}
+		else {
+			if (MorphologicalAA2) {
+				DWORD oldProtect, bck;
+				VirtualProtect((byte*)0x006EE6F8, 3, PAGE_EXECUTE_READWRITE, &oldProtect);
+				*((byte*)0x006EE6F8 + 0) = 0x83;
+				*((byte*)0x006EE6F8 + 1) = 0xE0;
+				*((byte*)0x006EE6F8 + 2) = 0x00;
+				VirtualProtect((byte*)0x006EE6F8, 3, oldProtect, &bck);
+				MorphologicalAA2 = !MorphologicalAA2;
+			}
+		}
+
+		if (ToonShader)
+		{
+			if (!ToonShader2)
+			{
+				DWORD oldProtect, bck;
+				VirtualProtect((BYTE*)0x00715B86, 2, PAGE_EXECUTE_READWRITE, &oldProtect);
+				*((byte*)0x00715B86 + 0) = 0x90;
+				*((byte*)0x00715B86 + 1) = 0x90;
+				VirtualProtect((BYTE*)0x006EE6F8, 2, oldProtect, &bck);
+				ToonShader2 = true;
+			}
+		}
+		else {
+			if (ToonShader2)
+			{
+				DWORD oldProtect, bck;
+				VirtualProtect((BYTE*)0x00715B86, 2, PAGE_EXECUTE_READWRITE, &oldProtect);
+				*((byte*)0x00715B86 + 0) = 0x74;
+				*((byte*)0x00715B86 + 1) = 0x0d;
+				VirtualProtect((BYTE*)0x006EE6F8, 2, oldProtect, &bck);
+				ToonShader2 = !ToonShader2;
+			}
+
+		}
+
 		pdm->customPlayerData->ModuleEquip[0] = ModuleEquip1;
 		pdm->customPlayerData->ModuleEquip[1] = ModuleEquip2;
 		pdm->customPlayerData->BtnSeEquip = BtnSeEquip;
