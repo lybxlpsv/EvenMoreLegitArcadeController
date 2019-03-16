@@ -308,4 +308,15 @@
       <Filter>Header Files</Filter>
     </Text>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="rom\keyconfig.ini">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="rom\playerdata.ini">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="rom\components.ini">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

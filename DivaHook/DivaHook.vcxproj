@@ -197,6 +197,11 @@
   <ItemGroup>
     <Text Include="rom\keyconfig.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="rom\components.ini" />
+    <None Include="rom\keyconfig.ini" />
+    <None Include="rom\playerdata.ini" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
