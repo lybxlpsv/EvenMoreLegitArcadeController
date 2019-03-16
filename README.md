@@ -1,3 +1,9 @@
+# This fork is just for testing/experimenting.
+Also most of the new things here is spaghetti-code quality. ![:slowpoke:](https://cdn.discordapp.com/emojis/531734661865668628.png)
+
+
+[Download binaries here](https://ci.appveyor.com/api/projects/lybxlpsv/evenmorelegitarcadecontroller/artifacts/release.zip?branch=experimental) [![Build status](https://ci.appveyor.com/api/projects/status/github/lybxlpsv/evenmorelegitarcadecontroller?svg=true)](https://ci.appveyor.com/project/lybxlpsv/evenmorelegitarcadecontroller)
+
 # Even More Legit Arcade Controller (ELAC)
 A collection of emulation components written in C++ for the purpose of operating Project DIVA Arcade on unintended hardware and generally improve the user experience.
 
