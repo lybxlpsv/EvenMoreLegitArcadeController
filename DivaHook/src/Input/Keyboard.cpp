@@ -29,15 +29,27 @@ namespace DivaHook::Input
 		{
 			currentState.KeyStates[i] = GetAsyncKeyState(i) < 0;
 
-			if ((int)i == 'S')
+			if ((int)i == 'K')
 			{
 				if (state.Gamepad.wButtons & XINPUT_GAMEPAD_A)
 					currentState.KeyStates[i] = true;
 			}
 
-			if ((int)i == 'D')
+			if ((int)i == 'S')
+			{
+				if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN)
+					currentState.KeyStates[i] = true;
+			}
+
+			if ((int)i == 'L')
 			{
 				if (state.Gamepad.wButtons & XINPUT_GAMEPAD_B)
+					currentState.KeyStates[i] = true;
+			}
+
+			if ((int)i == 'D')
+			{
+				if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
 					currentState.KeyStates[i] = true;
 			}
 
@@ -47,11 +59,37 @@ namespace DivaHook::Input
 					currentState.KeyStates[i] = true;
 			}
 
-			if ((int)i == 'W')
+			if ((int)i == 'J')
+			{
+				if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT)
+					currentState.KeyStates[i] = true;
+			}
+
+			if ((int)i == 'I')
 			{
 				if (state.Gamepad.wButtons & XINPUT_GAMEPAD_Y)
 					currentState.KeyStates[i] = true;
+
 			}
+
+			if ((int)i == 'W')
+			{
+				if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)
+					currentState.KeyStates[i] = true;
+
+			}
+
+			if ((int)i == 'Q')
+			{
+				if (state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
+					currentState.KeyStates[i] = true;
+			}
+			if ((int)i == 'E')
+			{
+				if (state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
+					currentState.KeyStates[i] = true;
+			}
+
 
 			KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
 		}
