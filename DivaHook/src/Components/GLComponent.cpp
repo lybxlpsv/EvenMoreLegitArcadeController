@@ -37,6 +37,9 @@ namespace DivaHook::Components
 	static float sleep = 0;
 	static float fpsdiff = 0;
 
+	static int maxrenderwidth = 2560;
+	static int maxrenderheight = 1440;
+
 	PlayerDataManager* pdm;
 
 	GLComponent::GLComponent()
@@ -123,8 +126,8 @@ namespace DivaHook::Components
 			ImGui::InputInt("Button SFX ID", &BtnSeEquip);
 			ImGui::InputInt("HUD Skin ID", &Skinequip);
 			ImGui::Text("--- Internal Resolution ---");
-			ImGui::SliderInt("Resolution Width", fbWidth, 640, 2560);
-			ImGui::SliderInt("Resolution Height", fbHeight, 360, 1440);
+			ImGui::SliderInt("Resolution Width", fbWidth, 640, maxrenderwidth);
+			ImGui::SliderInt("Resolution Height", fbHeight, 360, maxrenderheight);
 			ImGui::Text("--- Framerate ---");
 			ImGui::InputInt("Framerate Cap", &fps_limit);
 			ImGui::Text("--- Sound Settings ---");
@@ -209,6 +212,12 @@ namespace DivaHook::Components
 		ModuleEquip2 = pdm->customPlayerData->ModuleEquip[1];
 		BtnSeEquip = pdm->customPlayerData->BtnSeEquip;
 		Skinequip = pdm->customPlayerData->SkinEquip;
+
+		int* fbWidth = (int*)FB_RESOLUTION_WIDTH_ADDRESS;
+		int* fbHeight = (int*)FB_RESOLUTION_HEIGHT_ADDRESS;
+
+		maxrenderheight = *fbWidth;
+		maxrenderwidth = *fbHeight;
 
 		DWORD AddressToHook = (DWORD)GetProcAddress(GetModuleHandle(L"opengl32.dll"), "wglSwapBuffers");
 		owglSwapBuffers = Memory::JumpHook(AddressToHook, (DWORD)SwapTrampoline, 5);
