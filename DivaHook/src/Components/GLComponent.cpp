@@ -30,6 +30,7 @@ namespace DivaHook::Components
 	static bool showui = false;
 	static bool showfps = false;
 	static bool showui2 = false;
+	static bool showabout = false;
 	static int firsttime = 5000;
 	static int fps_limit = 0;
 	static int sfx_volume = 100;
@@ -37,6 +38,8 @@ namespace DivaHook::Components
 	static float ui_transparency = 0.8;
 	static float sleep = 0;
 	static float fpsdiff = 0;
+	static bool MorphologicalAA = 0;
+	static bool TemporalAA = 0;
 
 	static int maxrenderwidth = 2560;
 	static int maxrenderheight = 1440;
@@ -123,6 +126,27 @@ namespace DivaHook::Components
 			ImGui::Text("SLP: %.1fms", sleep);
 		}
 
+		if (showabout)
+		{
+			ImGuiWindowFlags window_flags = 0;
+			window_flags |= ImGuiWindowFlags_NoMove;
+			window_flags |= ImGuiWindowFlags_NoResize;
+			window_flags |= ImGuiWindowFlags_NoCollapse;
+			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+			io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+			ImGui::Begin("About DivaHook/ELAC", &showabout, window_flags);
+			ImGui::Text("Main Developer:");
+			ImGui::Text("Samyuu");
+			ImGui::Text("DIVAHook/ELAC Contributors:");
+			ImGui::Text("Brolijah, Crash5band, Rakisaionji, Deathride58, lybxlpsv");
+			ImGui::Text("DIVAHook UI by:");
+			ImGui::Text("lybxlpsv");
+			ImGui::Text("DIVAHook UI Contributors:");
+			ImGui::Text("BesuBaru");
+			if (ImGui::Button("Close")) { showabout = false; };
+		}
+
 		if (showui) {
 			ImGui::SetNextWindowBgAlpha(ui_transparency);
 			ImGuiWindowFlags window_flags = 0;
@@ -133,30 +157,41 @@ namespace DivaHook::Components
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 			ImGui::Begin("DivaHook Config", &showui, window_flags);
 			ImGui::Text("Changes only takes effect after entering a new stage.");
-			ImGui::Text("--- Modules and Custom Skins/Sounds ---");
-			ImGui::InputInt("Module 1 ID", &ModuleEquip1);
-			ImGui::InputInt("Module 2 ID", &ModuleEquip2);
-			ImGui::InputInt("Button SFX ID", &BtnSeEquip);
-			ImGui::InputInt("HUD Skin ID", &Skinequip);
-			ImGui::Text("--- Internal Resolution ---");
-			ImGui::SliderInt("Resolution Width", fbWidth, 640, maxrenderwidth);
-			ImGui::SliderInt("Resolution Height", fbHeight, 360, maxrenderheight);
-			ImGui::Text("--- Framerate ---");
-			ImGui::InputInt("Framerate Cap", &fps_limit);
-			ImGui::Text("--- Sound Settings ---");
-			ImGui::SliderInt("HP Volume", &bgm_volume, 0, 100);
-			ImGui::SliderInt("ACT Volume", &sfx_volume, 0, 100);
-			ImGui::Text("--- UI Settings ---");
-			ImGui::SliderFloat("UI Transparency", &ui_transparency, 0, 1.0);
-			ImGui::Checkbox("Framerate Overlay", &showfps);
-			if (ImGui::Button("Save"))
+			if (ImGui::CollapsingHeader("--- Modules and Custom Skins/Sounds ---"))
 			{
-				// do stuff
+				ImGui::InputInt("Module 1 ID", &ModuleEquip1);
+				ImGui::InputInt("Module 2 ID", &ModuleEquip2);
+				ImGui::InputInt("Button SFX ID", &BtnSeEquip);
+				ImGui::InputInt("HUD Skin ID", &Skinequip);
 			}
-			if (ImGui::Button("Close"))
+			if (ImGui::CollapsingHeader("--- Internal Resolution ---")) 
 			{
-				showui = false;
+				ImGui::SliderInt("Resolution Width", fbWidth, 640, maxrenderwidth);
+				ImGui::SliderInt("Resolution Height", fbHeight, 360, maxrenderheight);
 			}
+			if (ImGui::CollapsingHeader("--- Framerate ---"))
+			{
+				ImGui::InputInt("Framerate Cap", &fps_limit);
+			}
+			if (ImGui::CollapsingHeader("--- Graphics settings ---"))
+			{
+				ImGui::Text("--- Anti-Aliasing ---");
+				ImGui::Checkbox("MLAA (Morphological AA)", &MorphologicalAA);
+				ImGui::Checkbox("TAA (Temporal AA)", &TemporalAA);
+			}
+			if (ImGui::CollapsingHeader("--- Sound Settings ---"))
+			{
+				ImGui::SliderInt("HP Volume", &bgm_volume, 0, 100);
+				ImGui::SliderInt("ACT Volume", &sfx_volume, 0, 100);
+			}
+			if (ImGui::CollapsingHeader("--- UI Settings ---"))
+			{
+				ImGui::SliderFloat("UI Transparency", &ui_transparency, 0, 1.0);
+				ImGui::Checkbox("Framerate Overlay", &showfps);
+			}
+			if (ImGui::Button("Save")) {} ImGui::SameLine();
+			if (ImGui::Button("Close")) { showui = false; }; ImGui::SameLine();
+			if (ImGui::Button("About")) { showabout = true; } ImGui::SameLine();
 			ImGui::End();
 		}
 		else
