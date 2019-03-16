@@ -88,7 +88,7 @@ namespace DivaHook::Components
 		GetClientRect(DivaHook::MainModule::DivaWindowHandle, &hWindow);
 
 		ImGui::SetNextWindowBgAlpha(ui_transparency);
-
+		
 		ImGui_ImplWin32_NewFrame();
 		ImGui_ImplOpenGL2_NewFrame();
 		ImGui::NewFrame();
@@ -129,6 +129,8 @@ namespace DivaHook::Components
 			window_flags |= ImGuiWindowFlags_NoResize;
 			window_flags |= ImGuiWindowFlags_NoCollapse;
 			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+			io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 			ImGui::Begin("DivaHook Config", &showui, window_flags);
 			ImGui::Text("Changes only takes effect after entering a new stage.");
 			ImGui::Text("--- Modules and Custom Skins/Sounds ---");
@@ -150,6 +152,10 @@ namespace DivaHook::Components
 			if (ImGui::Button("Save"))
 			{
 				// do stuff
+			}
+			if (ImGui::Button("Close"))
+			{
+				showui = false;
 			}
 			ImGui::End();
 		}
