@@ -156,35 +156,35 @@ namespace DivaHook::Components
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 			ImGui::Begin("DivaHook Config", &showui, window_flags);
-			ImGui::Text("Changes only takes effect after entering a new stage.");
-			if (ImGui::CollapsingHeader("--- Modules and Custom Skins/Sounds ---"))
+			if (ImGui::CollapsingHeader("Modules and Custom Skins/Sounds"))
 			{
+				ImGui::Text("--- Changes only takes effect after entering a new stage. ---");
 				ImGui::InputInt("Module 1 ID", &ModuleEquip1);
 				ImGui::InputInt("Module 2 ID", &ModuleEquip2);
 				ImGui::InputInt("Button SFX ID", &BtnSeEquip);
 				ImGui::InputInt("HUD Skin ID", &Skinequip);
 			}
-			if (ImGui::CollapsingHeader("--- Internal Resolution ---")) 
+			if (ImGui::CollapsingHeader("Internal Resolution")) 
 			{
 				ImGui::SliderInt("Resolution Width", fbWidth, 640, maxrenderwidth);
 				ImGui::SliderInt("Resolution Height", fbHeight, 360, maxrenderheight);
 			}
-			if (ImGui::CollapsingHeader("--- Framerate ---"))
+			if (ImGui::CollapsingHeader("Framerate"))
 			{
 				ImGui::InputInt("Framerate Cap", &fps_limit);
 			}
-			if (ImGui::CollapsingHeader("--- Graphics settings ---"))
+			if (ImGui::CollapsingHeader("Graphics settings"))
 			{
 				ImGui::Text("--- Anti-Aliasing ---");
 				ImGui::Checkbox("MLAA (Morphological AA)", &MorphologicalAA);
 				ImGui::Checkbox("TAA (Temporal AA)", &TemporalAA);
 			}
-			if (ImGui::CollapsingHeader("--- Sound Settings ---"))
+			if (ImGui::CollapsingHeader("Sound Settings"))
 			{
 				ImGui::SliderInt("HP Volume", &bgm_volume, 0, 100);
 				ImGui::SliderInt("ACT Volume", &sfx_volume, 0, 100);
 			}
-			if (ImGui::CollapsingHeader("--- UI Settings ---"))
+			if (ImGui::CollapsingHeader("UI Settings"))
 			{
 				ImGui::SliderFloat("UI Transparency", &ui_transparency, 0, 1.0);
 				ImGui::Checkbox("Framerate Overlay", &showfps);
