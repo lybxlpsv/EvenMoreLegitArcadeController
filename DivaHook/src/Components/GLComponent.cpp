@@ -29,6 +29,7 @@ namespace DivaHook::Components
 	static int Skinequip = 0;
 	static bool showui = false;
 	static bool showfps = false;
+	static bool showui2 = false;
 	static int firsttime = 5000;
 	static int fps_limit = 0;
 	static int sfx_volume = 100;
@@ -68,7 +69,7 @@ namespace DivaHook::Components
 
 		if ((keyboard->IsDown(VK_CONTROL)) && (keyboard->IsDown(VK_LSHIFT)) && (keyboard->IsTapped(VK_BACK)))
 		{
-			if (showui) showui = false;
+			if (showui) { showui = false; showui2 = false; }
 			else showui = true;
 		}
 
@@ -131,8 +132,8 @@ namespace DivaHook::Components
 			ImGui::Text("--- Framerate ---");
 			ImGui::InputInt("Framerate Cap", &fps_limit);
 			ImGui::Text("--- Sound Settings ---");
-			ImGui::SliderInt("BGM Volume", &bgm_volume, 0, 100);
-			ImGui::SliderInt("SFX Volume", &sfx_volume, 0, 100);
+			ImGui::SliderInt("HP Volume", &bgm_volume, 0, 100);
+			ImGui::SliderInt("ACT Volume", &sfx_volume, 0, 100);
 			ImGui::Text("--- UI Settings ---");
 			ImGui::SliderFloat("UI Transparency", &ui_transparency, 0, 1.0);
 			ImGui::Checkbox("Framerate Overlay", &showfps);
@@ -216,8 +217,8 @@ namespace DivaHook::Components
 		int* fbWidth = (int*)FB_RESOLUTION_WIDTH_ADDRESS;
 		int* fbHeight = (int*)FB_RESOLUTION_HEIGHT_ADDRESS;
 
-		maxrenderheight = *fbWidth;
-		maxrenderwidth = *fbHeight;
+		maxrenderheight = *fbHeight;
+		maxrenderwidth = *fbWidth;
 
 		DWORD AddressToHook = (DWORD)GetProcAddress(GetModuleHandle(L"opengl32.dll"), "wglSwapBuffers");
 		owglSwapBuffers = Memory::JumpHook(AddressToHook, (DWORD)SwapTrampoline, 5);
@@ -239,6 +240,16 @@ namespace DivaHook::Components
 		pdm->customPlayerData->ModuleEquip[1] = ModuleEquip2;
 		pdm->customPlayerData->BtnSeEquip = BtnSeEquip;
 		pdm->customPlayerData->SkinEquip = Skinequip;
+		if (showui) {
+			if (!showui2)
+			{
+				bgm_volume = pdm->playerData->hp_vol;
+				sfx_volume = pdm->playerData->act_vol;
+				showui2 = true;
+			}
+			pdm->playerData->hp_vol = bgm_volume;
+			pdm->playerData->act_vol = sfx_volume;
+		}
 		pdm->Update();
 		if (firsttime > 0) firsttime = firsttime - round(GetElapsedTime());
 		//fps = 1000 / GetElapsedTime(); this takes alot of cpu :(
