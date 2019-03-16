@@ -8041,16 +8041,16 @@ static void ImGui::NavUpdateWindowing()
     }
 
     // Start CTRL-TAB or Square+L/R window selection
-    bool start_windowing_with_gamepad = !g.NavWindowingTarget && IsNavInputPressed(ImGuiNavInput_Menu, ImGuiInputReadMode_Pressed);
+    // bool start_windowing_with_gamepad = !g.NavWindowingTarget && IsNavInputPressed(ImGuiNavInput_Menu, ImGuiInputReadMode_Pressed);
     bool start_windowing_with_keyboard = !g.NavWindowingTarget && g.IO.KeyCtrl && IsKeyPressedMap(ImGuiKey_Tab) && (g.IO.ConfigFlags & ImGuiConfigFlags_NavEnableKeyboard);
-    if (start_windowing_with_gamepad || start_windowing_with_keyboard)
-        if (ImGuiWindow* window = g.NavWindow ? g.NavWindow : FindWindowNavFocusable(g.WindowsFocusOrder.Size - 1, -INT_MAX, -1))
-        {
-            g.NavWindowingTarget = g.NavWindowingTargetAnim = window;
-            g.NavWindowingTimer = g.NavWindowingHighlightAlpha = 0.0f;
-            g.NavWindowingToggleLayer = start_windowing_with_keyboard ? false : true;
-            g.NavInputSource = start_windowing_with_keyboard ? ImGuiInputSource_NavKeyboard : ImGuiInputSource_NavGamepad;
-        }
+    // if (start_windowing_with_gamepad || start_windowing_with_keyboard)
+        // if (ImGuiWindow* window = g.NavWindow ? g.NavWindow : FindWindowNavFocusable(g.WindowsFocusOrder.Size - 1, -INT_MAX, -1))
+        //{
+        //    g.NavWindowingTarget = g.NavWindowingTargetAnim = window;
+        //    g.NavWindowingTimer = g.NavWindowingHighlightAlpha = 0.0f;
+        //    g.NavWindowingToggleLayer = start_windowing_with_keyboard ? false : true;
+        //    g.NavInputSource = start_windowing_with_keyboard ? ImGuiInputSource_NavKeyboard : ImGuiInputSource_NavGamepad;
+        // }
 
     // Gamepad update
     g.NavWindowingTimer += g.IO.DeltaTime;
@@ -8068,15 +8068,15 @@ static void ImGui::NavUpdateWindowing()
         }
 
         // Single press toggles NavLayer, long press with L/R apply actual focus on release (until then the window was merely rendered front-most)
-        if (!IsNavInputDown(ImGuiNavInput_Menu))
-        {
-            g.NavWindowingToggleLayer &= (g.NavWindowingHighlightAlpha < 1.0f); // Once button was held long enough we don't consider it a tap-to-toggle-layer press anymore.
-            if (g.NavWindowingToggleLayer && g.NavWindow)
-                apply_toggle_layer = true;
-            else if (!g.NavWindowingToggleLayer)
-                apply_focus_window = g.NavWindowingTarget;
-            g.NavWindowingTarget = NULL;
-        }
+        // if (!IsNavInputDown(ImGuiNavInput_Menu))
+        // {
+        //    g.NavWindowingToggleLayer &= (g.NavWindowingHighlightAlpha < 1.0f); // Once button was held long enough we don't consider it a tap-to-toggle-layer press anymore.
+        //    if (g.NavWindowingToggleLayer && g.NavWindow)
+        //        apply_toggle_layer = true;
+        //    else if (!g.NavWindowingToggleLayer)
+        //        apply_focus_window = g.NavWindowingTarget;
+        //    g.NavWindowingTarget = NULL;
+        // }
     }
 
     // Keyboard: Focus
