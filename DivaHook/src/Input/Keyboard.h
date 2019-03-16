@@ -2,9 +2,6 @@
 #include "IInputDevice.h"
 #include "KeyboardState.h"
 #include "../Utilities/Stopwatch.h"
-#include <windows.h>
-#include <Xinput.h>
-
 
 namespace DivaHook::Input
 {
@@ -29,8 +26,6 @@ namespace DivaHook::Input
 		Keyboard();
 		KeyboardState lastState;
 		KeyboardState currentState;
-		XINPUT_STATE state;
-		XINPUT_STATE last_state;
 
 		BYTE KeyDoubleTapStates[KEYBOARD_KEYS];
 		Utilities::Stopwatch KeyDoubleTapWatches[KEYBOARD_KEYS];
