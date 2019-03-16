@@ -28,7 +28,7 @@ namespace DivaHook::Components
 	static int BtnSeEquip = 0;
 	static int Skinequip = 0;
 	static bool showui = false;
-	static bool showfps = true;
+	static bool showfps = false;
 	static int firsttime = 5000;
 	static int fps_limit = 0;
 	static int sfx_volume = 100;
