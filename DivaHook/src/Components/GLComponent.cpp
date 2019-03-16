@@ -184,7 +184,8 @@ namespace DivaHook::Components
 				ImGui::Text("--- Anti-Aliasing ---");
 				ImGui::Checkbox("MLAA (Morphological AA)", &MorphologicalAA);
 				ImGui::Checkbox("TAA (Temporal AA)", &TemporalAA);
-				ImGui::Checkbox("Toon Shader (-hdtv1080/-aa)", &ToonShader);
+				ImGui::Text("--- Bug Fixes ---");
+				ImGui::Checkbox("Toon Shader (When Running with: -hdtv1080/-aa)", &ToonShader);
 			}
 			if (ImGui::CollapsingHeader("Sound Settings"))
 			{
