@@ -87,6 +87,8 @@ namespace DivaHook::Components
 		RECT hWindow;
 		GetClientRect(DivaHook::MainModule::DivaWindowHandle, &hWindow);
 
+		ImGui::SetNextWindowBgAlpha(ui_transparency);
+
 		ImGui_ImplWin32_NewFrame();
 		ImGui_ImplOpenGL2_NewFrame();
 		ImGui::NewFrame();
@@ -107,8 +109,6 @@ namespace DivaHook::Components
 
 		if (showfps)
 		{
-			ImGui::SetNextWindowBgAlpha(ui_transparency);
-			ImGui::SetNextWindowBgAlpha(ui_transparency);
 			ImGuiWindowFlags window_flags = 0;
 			window_flags |= ImGuiWindowFlags_NoMove;
 			window_flags |= ImGuiWindowFlags_NoResize;
@@ -129,7 +129,7 @@ namespace DivaHook::Components
 			window_flags |= ImGuiWindowFlags_NoResize;
 			window_flags |= ImGuiWindowFlags_NoCollapse;
 			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
-			ImGui::Begin("DivaHook Config", &p_open, window_flags);
+			ImGui::Begin("DivaHook Config", &showui, window_flags);
 			ImGui::Text("Changes only takes effect after entering a new stage.");
 			ImGui::Text("--- Modules and Custom Skins/Sounds ---");
 			ImGui::InputInt("Module 1 ID", &ModuleEquip1);
