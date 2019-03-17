@@ -23,6 +23,9 @@
 
 namespace DivaHook::Components
 {
+	using namespace std::chrono;
+	using dsec = duration<double>;
+
 	static int ModuleEquip1 = 0;
 	static int ModuleEquip2 = 0;
 	static int BtnSeEquip = 0;
@@ -33,6 +36,7 @@ namespace DivaHook::Components
 	static bool showabout = false;
 	static int firsttime = 10000;
 	static int fps_limit = 0;
+	static int fps_limit_set = 0;
 	static int sfx_volume = 100;
 	static int bgm_volume = 100;
 	static float ui_transparency = 0.8;
@@ -47,6 +51,9 @@ namespace DivaHook::Components
 
 	static int maxrenderwidth = 2560;
 	static int maxrenderheight = 1440;
+	static std::chrono::time_point m_BeginFrame = system_clock::now();
+	static std::chrono::time_point prev_time_in_seconds = time_point_cast<seconds>(m_BeginFrame);
+	static unsigned frame_count_per_second = 0;
 
 	PlayerDataManager* pdm;
 
@@ -123,7 +130,7 @@ namespace DivaHook::Components
 			window_flags |= ImGuiWindowFlags_NoTitleBar;
 			window_flags |= ImGuiWindowFlags_NoCollapse;
 			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
-			ImGui::Begin("", &p_open, window_flags);
+			ImGui::Begin("FPS", &p_open, window_flags);
 			ImGui::SetWindowPos(ImVec2(hWindow.right - 100, 0));
 			ImGui::SetWindowSize(ImVec2(100, 70));
 			ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
@@ -178,7 +185,7 @@ namespace DivaHook::Components
 			}
 			if (ImGui::CollapsingHeader("Framerate"))
 			{
-				ImGui::InputInt("Framerate Cap", &fps_limit);
+				ImGui::InputInt("Framerate Cap", &fps_limit_set);
 			}
 			if (ImGui::CollapsingHeader("Graphics settings"))
 			{
@@ -214,34 +221,30 @@ namespace DivaHook::Components
 		//The worst framelimit/pacer ever.
 		//TODO : Destroy this thing and replace with a much better one.
 
-		if (fpsdiff > 0)
+		if (fps_limit_set != fps_limit)
 		{
-			if (fpsdiff > 4) sleep = sleep + 0.02f;
-			if (fpsdiff > 3) sleep = sleep + 0.01f;
-			if (fpsdiff > 2) sleep = sleep + 0.01f;
-			if (fpsdiff > 1) sleep = sleep + 0.0075f;
-			if (fpsdiff > 0.5) sleep = sleep + 0.005f;
-			sleep = sleep + 0.005f;
-		}
-		else {
-			if (sleep > 0) {
-				if (fpsdiff < -4) sleep = sleep - 0.02f;
-				if (fpsdiff < -3) sleep = sleep - 0.01f;
-				if (fpsdiff < -2) sleep = sleep - 0.01f;
-				if (fpsdiff < -1) sleep = sleep - 0.0075f;
-				if (fpsdiff < -0.5) sleep = sleep - 0.005f;
-				sleep = sleep - 0.005f;
-			}
-			else sleep = 0;
+			std::chrono::time_point m_BeginFrame = system_clock::now();
+			std::chrono::time_point prev_time_in_seconds = time_point_cast<seconds>(m_BeginFrame);
+			frame_count_per_second = 0;
+			fps_limit = fps_limit_set;
 		}
 
-		fpsdiff = (1000 / (float)fps_limit) - (1000 / ImGui::GetIO().Framerate);
-		if (fps_limit > 30)
+		auto invFpsLimit = duration_cast<system_clock::duration>(dsec{ 1. / fps_limit });
+		auto m_EndFrame = m_BeginFrame + invFpsLimit;
+
+		auto time_in_seconds = time_point_cast<seconds>(system_clock::now());
+		++frame_count_per_second;
+		if (time_in_seconds > prev_time_in_seconds)
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds((int)sleep));
-			
+			frame_count_per_second = 0;
+			prev_time_in_seconds = time_in_seconds;
 		}
-		else sleep = 0;
+
+		// This part keeps the frame rate.
+		if (fps_limit > 30)
+			std::this_thread::sleep_until(m_EndFrame);
+		m_BeginFrame = m_EndFrame;
+		m_EndFrame = m_BeginFrame + invFpsLimit;
 
 		return;
 	}
