@@ -31,7 +31,7 @@ namespace DivaHook::Components
 	static bool showfps = false;
 	static bool showui2 = false;
 	static bool showabout = false;
-	static int firsttime = 5000;
+	static int firsttime = 10000;
 	static int fps_limit = 0;
 	static int sfx_volume = 100;
 	static int bgm_volume = 100;
@@ -116,6 +116,7 @@ namespace DivaHook::Components
 
 		if (showfps)
 		{
+			ImGui::SetNextWindowBgAlpha(ui_transparency);
 			ImGuiWindowFlags window_flags = 0;
 			window_flags |= ImGuiWindowFlags_NoMove;
 			window_flags |= ImGuiWindowFlags_NoResize;
