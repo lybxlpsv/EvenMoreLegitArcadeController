@@ -214,7 +214,6 @@ namespace DivaHook::Components
 				ImGui::SliderFloat("UI Transparency", &uiTransparency, 0, 1.0);
 				ImGui::Checkbox("Framerate Overlay", &showFps);
 			}
-			if (ImGui::Button("Save")) {} ImGui::SameLine();
 			if (ImGui::Button("Close")) { showUi = false; }; ImGui::SameLine();
 			if (ImGui::Button("About")) { showAbout = true; } ImGui::SameLine();
 			ImGui::End();
