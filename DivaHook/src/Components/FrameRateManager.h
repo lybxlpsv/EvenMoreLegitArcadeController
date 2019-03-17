@@ -14,9 +14,6 @@ namespace DivaHook::Components
 		virtual void Initialize() override;
 		virtual void Update() override;
 
-		bool useFpsLimitValue = false;
-		float fps_limit = 60;
-
 	private:
 		float *pvFrameRate;
 		float *frameSpeed;

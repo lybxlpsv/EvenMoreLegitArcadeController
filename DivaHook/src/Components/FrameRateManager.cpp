@@ -35,11 +35,7 @@ namespace DivaHook::Components
 
 	void FrameRateManager::Update()
 	{
-		float frameRate = 60;
-		if (useFpsLimitValue)
-			frameRate = fps_limit;
-		else
-			frameRate = RoundFrameRate(GetGameFrameRate());
+		float frameRate = RoundFrameRate(GetGameFrameRate());
 
 		*aetFrameDuration = 1.0f / frameRate;
 		*pvFrameRate = frameRate;

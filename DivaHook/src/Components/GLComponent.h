@@ -15,6 +15,8 @@ namespace DivaHook::Components
 		virtual void Update() override;
 		virtual void UpdateInput() override;
 		
+	
+
 		double* fbAspectRatio;
 	};
 }
