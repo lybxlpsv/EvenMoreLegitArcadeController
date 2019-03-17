@@ -18,6 +18,8 @@ using namespace DivaHook::Input;
 using namespace DivaHook::Input::KeyConfig;
 using namespace DivaHook::Utilities;
 
+bool InputEmu_HookWindowFocused = false;
+
 namespace DivaHook::Components
 {
 	InputEmulator::InputEmulator()
@@ -89,37 +91,55 @@ namespace DivaHook::Components
 		inputState->HideCursor();
 	}
 
+	void InputEmulator::HookWindowFocus()
+	{
+		InputEmu_HookWindowFocused = true;
+	}
+
+	void InputEmulator::HookWindowUnFocus()
+	{
+		InputEmu_HookWindowFocused = false;
+
+	}
+
 	void InputEmulator::UpdateInput()
 	{
-		auto tappedFunc = [](void* binding) { return ((Binding*)binding)->AnyTapped(); };
-		auto releasedFunc = [](void* binding) { return ((Binding*)binding)->AnyReleased(); };
-		auto downFunc = [](void* binding) { return ((Binding*)binding)->AnyDown(); };
-		auto doubleTapFunc = [](void* binding) { return ((Binding*)binding)->AnyDoubleTapped(); };
+		if (InputEmu_HookWindowFocused)
+		{
+			inputState->ClearState();
+		}
+		else
+		{
+			auto tappedFunc = [](void* binding) { return ((Binding*)binding)->AnyTapped(); };
+			auto releasedFunc = [](void* binding) { return ((Binding*)binding)->AnyReleased(); };
+			auto downFunc = [](void* binding) { return ((Binding*)binding)->AnyDown(); };
+			auto doubleTapFunc = [](void* binding) { return ((Binding*)binding)->AnyDoubleTapped(); };
 
-		inputState->Tapped.Buttons = GetJvsButtonsState(tappedFunc);
-		inputState->Released.Buttons = GetJvsButtonsState(releasedFunc);
-		inputState->Down.Buttons = GetJvsButtonsState(downFunc);
-		inputState->DoubleTapped.Buttons = GetJvsButtonsState(doubleTapFunc);
-		inputState->IntervalTapped.Buttons = GetJvsButtonsState(tappedFunc);
+			inputState->Tapped.Buttons = GetJvsButtonsState(tappedFunc);
+			inputState->Released.Buttons = GetJvsButtonsState(releasedFunc);
+			inputState->Down.Buttons = GetJvsButtonsState(downFunc);
+			inputState->DoubleTapped.Buttons = GetJvsButtonsState(doubleTapFunc);
+			inputState->IntervalTapped.Buttons = GetJvsButtonsState(tappedFunc);
 
-		// repress held down buttons to not block input
-		inputState->Down.Buttons ^= inputState->Tapped.Buttons;
+			// repress held down buttons to not block input
+			inputState->Down.Buttons ^= inputState->Tapped.Buttons;
 
-		auto keyboard = Keyboard::GetInstance();
-		auto mouse = Mouse::GetInstance();
+			auto keyboard = Keyboard::GetInstance();
+			auto mouse = Mouse::GetInstance();
 
-		auto pos = mouse->GetRelativePosition();
-		inputState->MouseX = (int)pos.x;
-		inputState->MouseY = (int)pos.y;
+			auto pos = mouse->GetRelativePosition();
+			inputState->MouseX = (int)pos.x;
+			inputState->MouseY = (int)pos.y;
 
-		auto deltaPos = mouse->GetDeltaPosition();
-		inputState->MouseDeltaX = (int)deltaPos.x;
-		inputState->MouseDeltaY = (int)deltaPos.y;
+			auto deltaPos = mouse->GetDeltaPosition();
+			inputState->MouseDeltaX = (int)deltaPos.x;
+			inputState->MouseDeltaY = (int)deltaPos.y;
 
-		inputState->Key = GetKeyState();
+			inputState->Key = GetKeyState();
 
-		for (int i = 0; i < sizeof(keyBits) / sizeof(KeyBit); i++)
-			UpdateInputBit(keyBits[i].Bit, keyBits[i].KeyCode);
+			for (int i = 0; i < sizeof(keyBits) / sizeof(KeyBit); i++)
+				UpdateInputBit(keyBits[i].Bit, keyBits[i].KeyCode);
+		}
 	}
 
 	InputState* InputEmulator::GetInputStatePtr(void *address)
