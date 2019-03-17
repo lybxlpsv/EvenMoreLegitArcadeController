@@ -29,39 +29,39 @@ namespace DivaHook::Components
 	using namespace std::chrono;
 	using dsec = duration<double>;
 
-	static int ModuleEquip1 = 0;
-	static int ModuleEquip2 = 0;
-	static int BtnSeEquip = 0;
-	static int Skinequip = 0;
-	static bool showui = false;
-	static bool showfps = false;
-	static bool showui2 = false;
-	static bool showabout = false;
-	static int firsttime = 10000;
-	static int fps_limit = 0;
-	static int fps_limit_set = 0;
-	static int sfx_volume = 100;
-	static int bgm_volume = 100;
-	static float ui_transparency = 0.8;
+	static int moduleEquip1 = 0;
+	static int moduleEquip2 = 0;
+	static int btnSeEquip = 0;
+	static int skinEquip = 0;
+	static bool showUi = false;
+	static bool showFps = false;
+	static bool showUi2 = false;
+	static bool showAbout = false;
+	static int firstTime = 10000;
+	static int fpsLimit = 0;
+	static int fpsLimitSet = 0;
+	static int sfxVolume = 100;
+	static int bgmVolume = 100;
+	static float uiTransparency = 0.8;
 	static float sleep = 0;
-	static float fpsdiff = 0;
-	static bool MorphologicalAA = 0;
-	static bool MorphologicalAA2 = 0;
-	static bool TemporalAA = 0;
+	static float fpsDiff = 0;
+	static bool morphologicalAA = 0;
+	static bool morphologicalAA2 = 0;
+	static bool temporalAA = 0;
 
-	static bool ToonShader = true;
-	static bool ToonShader2 = false;
+	static bool toonShader = true;
+	static bool toonShader2 = false;
 
 	PlayerDataManager* pdm;
 	FrameRateManager* frm;
 	InputEmulator* inp;
 	TouchPanelEmulator* tch;
 
-	static int maxrenderwidth = 2560;
-	static int maxrenderheight = 1440;
+	static int maxRenderWidth = 2560;
+	static int maxRenderHeight = 1440;
 	static std::chrono::time_point m_BeginFrame = system_clock::now();
 	static std::chrono::time_point prev_time_in_seconds = time_point_cast<seconds>(m_BeginFrame);
-	static unsigned frame_count_per_second = 0;
+	static unsigned frameCountPerSecond = 0;
 	
 	GLComponent::GLComponent()
 	{
@@ -92,8 +92,8 @@ namespace DivaHook::Components
 
 		if ((keyboard->IsDown(VK_CONTROL)) && (keyboard->IsDown(VK_LSHIFT)) && (keyboard->IsTapped(VK_BACK)))
 		{
-			if (showui) { showui = false; showui2 = false; }
-			else showui = true;
+			if (showUi) { showUi = false; showUi2 = false; }
+			else showUi = true;
 		}
 
 		int i = 48;
@@ -110,13 +110,13 @@ namespace DivaHook::Components
 		RECT hWindow;
 		GetClientRect(DivaHook::MainModule::DivaWindowHandle, &hWindow);
 
-		ImGui::SetNextWindowBgAlpha(ui_transparency);
+		ImGui::SetNextWindowBgAlpha(uiTransparency);
 		
 		ImGui_ImplWin32_NewFrame();
 		ImGui_ImplOpenGL2_NewFrame();
 		ImGui::NewFrame();
 
-		if (firsttime > 0)
+		if (firstTime > 0)
 		{
 			ImGuiWindowFlags window_flags = 0;
 			window_flags |= ImGuiWindowFlags_NoMove;
@@ -130,9 +130,9 @@ namespace DivaHook::Components
 			ImGui::End();
 		}
 
-		if (showfps)
+		if (showFps)
 		{
-			ImGui::SetNextWindowBgAlpha(ui_transparency);
+			ImGui::SetNextWindowBgAlpha(uiTransparency);
 			ImGuiWindowFlags window_flags = 0;
 			window_flags |= ImGuiWindowFlags_NoMove;
 			window_flags |= ImGuiWindowFlags_NoResize;
@@ -147,7 +147,7 @@ namespace DivaHook::Components
 			ImGui::End();
 		}
 
-		if (showabout)
+		if (showAbout)
 		{
 			ImGuiWindowFlags window_flags = 0;
 			window_flags |= ImGuiWindowFlags_NoMove;
@@ -156,7 +156,7 @@ namespace DivaHook::Components
 			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-			ImGui::Begin("About DivaHook/ELAC", &showabout, window_flags);
+			ImGui::Begin("About DivaHook/ELAC", &showAbout, window_flags);
 			ImGui::Text("Main Developer:");
 			ImGui::Text("Samyuu");
 			ImGui::Text("DIVAHook/ELAC Contributors:");
@@ -165,58 +165,58 @@ namespace DivaHook::Components
 			ImGui::Text("lybxlpsv");
 			ImGui::Text("DIVAHook UI Contributors:");
 			ImGui::Text("BesuBaru");
-			if (ImGui::Button("Close")) { showabout = false; };
+			if (ImGui::Button("Close")) { showAbout = false; };
 			ImGui::End();
 		}
 
-		if (showui) {
-			ImGui::SetNextWindowBgAlpha(ui_transparency);
+		if (showUi) {
+			ImGui::SetNextWindowBgAlpha(uiTransparency);
 			ImGuiWindowFlags window_flags = 0;
 			window_flags |= ImGuiWindowFlags_NoResize;
 			window_flags |= ImGuiWindowFlags_NoCollapse;
 			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-			ImGui::Begin("DivaHook Config", &showui, window_flags);
+			ImGui::Begin("DivaHook Config", &showUi, window_flags);
 			if (ImGui::CollapsingHeader("Modules and Custom Skins/Sounds"))
 			{
 				ImGui::Text("--- Changes only takes effect after entering a new stage. ---");
-				ImGui::InputInt("Module 1 ID", &ModuleEquip1);
-				ImGui::InputInt("Module 2 ID", &ModuleEquip2);
-				ImGui::InputInt("Button SFX ID", &BtnSeEquip);
-				ImGui::InputInt("HUD Skin ID", &Skinequip);
+				ImGui::InputInt("Module 1 ID", &moduleEquip1);
+				ImGui::InputInt("Module 2 ID", &moduleEquip2);
+				ImGui::InputInt("Button SFX ID", &btnSeEquip);
+				ImGui::InputInt("HUD Skin ID", &skinEquip);
 			}
 			if (ImGui::CollapsingHeader("Internal Resolution")) 
 			{
-				ImGui::SliderInt("Resolution Width", fbWidth, 640, maxrenderwidth);
-				ImGui::SliderInt("Resolution Height", fbHeight, 360, maxrenderheight);
+				ImGui::SliderInt("Resolution Width", fbWidth, 640, maxRenderWidth);
+				ImGui::SliderInt("Resolution Height", fbHeight, 360, maxRenderHeight);
 			}
 			if (ImGui::CollapsingHeader("Framerate"))
 			{
 				ImGui::Text("--- Setting the FPS cap to 0 may cause animation desync issues. ---");
-				ImGui::InputInt("Framerate Cap", &fps_limit_set);
+				ImGui::InputInt("Framerate Cap", &fpsLimitSet);
 			}
 			if (ImGui::CollapsingHeader("Graphics settings"))
 			{
 				ImGui::Text("--- Anti-Aliasing ---");
-				ImGui::Checkbox("MLAA (Morphological AA)", &MorphologicalAA);
-				ImGui::Checkbox("TAA (Temporal AA)", &TemporalAA);
+				ImGui::Checkbox("MLAA (Morphological AA)", &morphologicalAA);
+				ImGui::Checkbox("TAA (Temporal AA)", &temporalAA);
 				ImGui::Text("--- Bug Fixes ---");
-				ImGui::Checkbox("Toon Shader (When Running with: -hdtv1080/-aa)", &ToonShader);
+				ImGui::Checkbox("Toon Shader (When Running with: -hdtv1080/-aa)", &toonShader);
 			}
 			if (ImGui::CollapsingHeader("Sound Settings"))
 			{
-				ImGui::SliderInt("HP Volume", &bgm_volume, 0, 100);
-				ImGui::SliderInt("ACT Volume", &sfx_volume, 0, 100);
+				ImGui::SliderInt("HP Volume", &bgmVolume, 0, 100);
+				ImGui::SliderInt("ACT Volume", &sfxVolume, 0, 100);
 			}
 			if (ImGui::CollapsingHeader("UI Settings"))
 			{
-				ImGui::SliderFloat("UI Transparency", &ui_transparency, 0, 1.0);
-				ImGui::Checkbox("Framerate Overlay", &showfps);
+				ImGui::SliderFloat("UI Transparency", &uiTransparency, 0, 1.0);
+				ImGui::Checkbox("Framerate Overlay", &showFps);
 			}
 			if (ImGui::Button("Save")) {} ImGui::SameLine();
-			if (ImGui::Button("Close")) { showui = false; }; ImGui::SameLine();
-			if (ImGui::Button("About")) { showabout = true; } ImGui::SameLine();
+			if (ImGui::Button("Close")) { showUi = false; }; ImGui::SameLine();
+			if (ImGui::Button("About")) { showAbout = true; } ImGui::SameLine();
 			ImGui::End();
 		}
 		else
@@ -230,27 +230,27 @@ namespace DivaHook::Components
 		//The worst framelimit/pacer ever.
 		//TODO : Destroy this thing and replace with a much better one.
 
-		if (fps_limit_set != fps_limit)
+		if (fpsLimitSet != fpsLimit)
 		{
 			m_BeginFrame = system_clock::now();
 			prev_time_in_seconds = time_point_cast<seconds>(m_BeginFrame);
-			frame_count_per_second = 0;
-			fps_limit = fps_limit_set;
+			frameCountPerSecond = 0;
+			fpsLimit = fpsLimitSet;
 		}
 
-		auto invFpsLimit = round<system_clock::duration>(dsec{ 1. / fps_limit });
+		auto invFpsLimit = round<system_clock::duration>(dsec{ 1. / fpsLimit });
 		auto m_EndFrame = m_BeginFrame + invFpsLimit;
 
 		auto time_in_seconds = time_point_cast<seconds>(system_clock::now());
-		++frame_count_per_second;
+		++frameCountPerSecond;
 		if (time_in_seconds > prev_time_in_seconds)
 		{
-			frame_count_per_second = 0;
+			frameCountPerSecond = 0;
 			prev_time_in_seconds = time_in_seconds;
 		}
 
 		// This part keeps the frame rate.
-		if (fps_limit > 19)
+		if (fpsLimit > 19)
 			std::this_thread::sleep_until(m_EndFrame);
 		m_BeginFrame = m_EndFrame;
 		m_EndFrame = m_BeginFrame + invFpsLimit;
@@ -285,16 +285,16 @@ namespace DivaHook::Components
 		tch->Initialize();
 		inp->Initialize();
 
-		ModuleEquip1 = pdm->customPlayerData->ModuleEquip[0];
-		ModuleEquip2 = pdm->customPlayerData->ModuleEquip[1];
-		BtnSeEquip = pdm->customPlayerData->BtnSeEquip;
-		Skinequip = pdm->customPlayerData->SkinEquip;
+		moduleEquip1 = pdm->customPlayerData->ModuleEquip[0];
+		moduleEquip2 = pdm->customPlayerData->ModuleEquip[1];
+		btnSeEquip = pdm->customPlayerData->BtnSeEquip;
+		skinEquip = pdm->customPlayerData->SkinEquip;
 
 		int* fbWidth = (int*)FB_RESOLUTION_WIDTH_ADDRESS;
 		int* fbHeight = (int*)FB_RESOLUTION_HEIGHT_ADDRESS;
 
-		maxrenderheight = *fbHeight;
-		maxrenderwidth = *fbWidth;
+		maxRenderHeight = *fbHeight;
+		maxRenderWidth = *fbWidth;
 
 		DWORD AddressToHook = (DWORD)GetProcAddress(GetModuleHandle(L"opengl32.dll"), "wglSwapBuffers");
 		owglSwapBuffers = Memory::JumpHook(AddressToHook, (DWORD)SwapTrampoline, 5);
@@ -312,8 +312,8 @@ namespace DivaHook::Components
 
 	void GLComponent::Update()
 	{
-		frm->fps_limit = fps_limit;
-		if (fps_limit > 19)
+		frm->fps_limit = fpsLimit;
+		if (fpsLimit > 19)
 		{
 			frm->useFpsLimitValue = true;
 		}
@@ -321,7 +321,7 @@ namespace DivaHook::Components
 				
 		int* taa;
 		taa = (int*)GFX_TEMPORAL_AA;
-		if (TemporalAA)
+		if (temporalAA)
 		{
 			DWORD oldProtect, bck;
 			VirtualProtect((BYTE*)GFX_TEMPORAL_AA, 1, PAGE_EXECUTE_READWRITE, &oldProtect);
@@ -335,77 +335,77 @@ namespace DivaHook::Components
 			VirtualProtect((BYTE*)GFX_TEMPORAL_AA, 1, oldProtect, &bck);
 		}
 
-		if (MorphologicalAA)
+		if (morphologicalAA)
 		{
-			if (!MorphologicalAA2) {
+			if (!morphologicalAA2) {
 				DWORD oldProtect, bck;
 				VirtualProtect((BYTE*)0x006EE6F8, 3, PAGE_EXECUTE_READWRITE, &oldProtect);
 				*((byte*)0x006EE6F8 + 0) = 0x85;
 				*((byte*)0x006EE6F8 + 1) = 0x45;
 				*((byte*)0x006EE6F8 + 2) = 0x10;
 				VirtualProtect((BYTE*)0x006EE6F8, 3, oldProtect, &bck);
-				MorphologicalAA2 = true;
+				morphologicalAA2 = true;
 			}
 		}
 		else {
-			if (MorphologicalAA2) {
+			if (morphologicalAA2) {
 				DWORD oldProtect, bck;
 				VirtualProtect((byte*)0x006EE6F8, 3, PAGE_EXECUTE_READWRITE, &oldProtect);
 				*((byte*)0x006EE6F8 + 0) = 0x83;
 				*((byte*)0x006EE6F8 + 1) = 0xE0;
 				*((byte*)0x006EE6F8 + 2) = 0x00;
 				VirtualProtect((byte*)0x006EE6F8, 3, oldProtect, &bck);
-				MorphologicalAA2 = !MorphologicalAA2;
+				morphologicalAA2 = !morphologicalAA2;
 			}
 		}
 
-		if (ToonShader)
+		if (toonShader)
 		{
-			if (!ToonShader2)
+			if (!toonShader2)
 			{
 				DWORD oldProtect, bck;
 				VirtualProtect((BYTE*)0x00715B86, 2, PAGE_EXECUTE_READWRITE, &oldProtect);
 				*((byte*)0x00715B86 + 0) = 0x90;
 				*((byte*)0x00715B86 + 1) = 0x90;
 				VirtualProtect((BYTE*)0x006EE6F8, 2, oldProtect, &bck);
-				ToonShader2 = true;
+				toonShader2 = true;
 			}
 		}
 		else {
-			if (ToonShader2)
+			if (toonShader2)
 			{
 				DWORD oldProtect, bck;
 				VirtualProtect((BYTE*)0x00715B86, 2, PAGE_EXECUTE_READWRITE, &oldProtect);
 				*((byte*)0x00715B86 + 0) = 0x74;
 				*((byte*)0x00715B86 + 1) = 0x0d;
 				VirtualProtect((BYTE*)0x006EE6F8, 2, oldProtect, &bck);
-				ToonShader2 = !ToonShader2;
+				toonShader2 = !toonShader2;
 			}
 		}
-		pdm->customPlayerData->ModuleEquip[0] = ModuleEquip1;
-		pdm->customPlayerData->ModuleEquip[1] = ModuleEquip2;
-		pdm->customPlayerData->BtnSeEquip = BtnSeEquip;
-		pdm->customPlayerData->SkinEquip = Skinequip;
-		if (showui) {
-			if (!showui2)
+		pdm->customPlayerData->ModuleEquip[0] = moduleEquip1;
+		pdm->customPlayerData->ModuleEquip[1] = moduleEquip2;
+		pdm->customPlayerData->BtnSeEquip = btnSeEquip;
+		pdm->customPlayerData->SkinEquip = skinEquip;
+		if (showUi) {
+			if (!showUi2)
 			{
-				bgm_volume = pdm->playerData->hp_vol;
-				sfx_volume = pdm->playerData->act_vol;
-				showui2 = true;
+				bgmVolume = pdm->playerData->hp_vol;
+				sfxVolume = pdm->playerData->act_vol;
+				showUi2 = true;
 			}
-			pdm->playerData->hp_vol = bgm_volume;
-			pdm->playerData->act_vol = sfx_volume;
+			pdm->playerData->hp_vol = bgmVolume;
+			pdm->playerData->act_vol = sfxVolume;
 		}
 		pdm->Update();
 		frm->Update();
 
-		if (!showui)
+		if (!showUi)
 		{
 			tch->Update();
 			inp->Update();
 		}
 
-		if (firsttime > 0) firsttime = firsttime - round(GetElapsedTime());
+		if (firstTime > 0) firstTime = firstTime - round(GetElapsedTime());
 		return;
 	}
 
@@ -413,7 +413,7 @@ namespace DivaHook::Components
 	{
 		pdm->UpdateInput();
 		frm->UpdateInput();
-		if (!showui)
+		if (!showUi)
 		{
 			inp->UpdateInput();
 			tch->UpdateInput();
