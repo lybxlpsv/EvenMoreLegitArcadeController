@@ -59,8 +59,8 @@ namespace DivaHook::Components
 
 	static int maxRenderWidth = 2560;
 	static int maxRenderHeight = 1440;
-	static std::chrono::time_point m_BeginFrame = system_clock::now();
-	static std::chrono::time_point prev_time_in_seconds = time_point_cast<seconds>(m_BeginFrame);
+	static std::chrono::time_point mBeginFrame = system_clock::now();
+	static std::chrono::time_point prevTimeInSeconds = time_point_cast<seconds>(mBeginFrame);
 	static unsigned frameCountPerSecond = 0;
 	
 	GLComponent::GLComponent()
@@ -232,28 +232,28 @@ namespace DivaHook::Components
 
 		if (fpsLimitSet != fpsLimit)
 		{
-			m_BeginFrame = system_clock::now();
-			prev_time_in_seconds = time_point_cast<seconds>(m_BeginFrame);
+			mBeginFrame = system_clock::now();
+			prevTimeInSeconds = time_point_cast<seconds>(mBeginFrame);
 			frameCountPerSecond = 0;
 			fpsLimit = fpsLimitSet;
 		}
 
 		auto invFpsLimit = round<system_clock::duration>(dsec{ 1. / fpsLimit });
-		auto m_EndFrame = m_BeginFrame + invFpsLimit;
+		auto mEndFrame = mBeginFrame + invFpsLimit;
 
 		auto time_in_seconds = time_point_cast<seconds>(system_clock::now());
 		++frameCountPerSecond;
-		if (time_in_seconds > prev_time_in_seconds)
+		if (time_in_seconds > prevTimeInSeconds)
 		{
 			frameCountPerSecond = 0;
-			prev_time_in_seconds = time_in_seconds;
+			prevTimeInSeconds = time_in_seconds;
 		}
 
 		// This part keeps the frame rate.
 		if (fpsLimit > 19)
-			std::this_thread::sleep_until(m_EndFrame);
-		m_BeginFrame = m_EndFrame;
-		m_EndFrame = m_BeginFrame + invFpsLimit;
+			std::this_thread::sleep_until(mEndFrame);
+		mBeginFrame = mEndFrame;
+		mEndFrame = mBeginFrame + invFpsLimit;
 
 		return;
 	}
@@ -312,7 +312,7 @@ namespace DivaHook::Components
 
 	void GLComponent::Update()
 	{
-		frm->fps_limit = fpsLimit;
+		frm->fpsLimit = fpsLimit;
 		if (fpsLimit > 19)
 		{
 			frm->useFpsLimitValue = true;
