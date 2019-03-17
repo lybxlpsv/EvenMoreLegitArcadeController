@@ -193,7 +193,7 @@ namespace DivaHook::Components
 			}
 			if (ImGui::CollapsingHeader("Framerate"))
 			{
-				ImGui::Text("--- Setting the FPS cap to 0 may cause animation desync issues. ---");
+				ImGui::Text("--- Set the FPS cap to 0 only if you have vsync. ---");
 				ImGui::InputInt("Framerate Cap", &fpsLimitSet);
 			}
 			if (ImGui::CollapsingHeader("Graphics settings"))
