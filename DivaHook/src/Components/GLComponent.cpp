@@ -136,7 +136,7 @@ namespace DivaHook::Components
 			ImGui::SetWindowPos(ImVec2(hWindow.right - 100, 0));
 			ImGui::SetWindowSize(ImVec2(100, 70));
 			ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
-			ImGui::Text("FT: %.1fms", 1000 / ImGui::GetIO().Framerate);
+			ImGui::Text("FT: %.2fms", 1000 / ImGui::GetIO().Framerate);
 			ImGui::End();
 		}
 
