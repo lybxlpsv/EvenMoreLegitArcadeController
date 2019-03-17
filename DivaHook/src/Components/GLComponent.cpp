@@ -233,7 +233,7 @@ namespace DivaHook::Components
 			fps_limit = fps_limit_set;
 		}
 
-		auto invFpsLimit = duration_cast<system_clock::duration>(dsec{ 1. / fps_limit });
+		auto invFpsLimit = round<system_clock::duration>(dsec{ 1. / fps_limit });
 		auto m_EndFrame = m_BeginFrame + invFpsLimit;
 
 		auto time_in_seconds = time_point_cast<seconds>(system_clock::now());
