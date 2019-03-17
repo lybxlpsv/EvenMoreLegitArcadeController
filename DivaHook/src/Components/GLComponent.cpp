@@ -250,7 +250,7 @@ namespace DivaHook::Components
 		}
 
 		// This part keeps the frame rate.
-		if (fps_limit > 30)
+		if (fps_limit > 19)
 			std::this_thread::sleep_until(m_EndFrame);
 		m_BeginFrame = m_EndFrame;
 		m_EndFrame = m_BeginFrame + invFpsLimit;
@@ -313,7 +313,7 @@ namespace DivaHook::Components
 	void GLComponent::Update()
 	{
 		frm->fps_limit = fps_limit;
-		if (fps_limit > 30)
+		if (fps_limit > 19)
 		{
 			frm->useFpsLimitValue = true;
 		}
