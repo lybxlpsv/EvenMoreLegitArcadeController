@@ -48,12 +48,8 @@ namespace DivaHook::Components
 	static int maxrenderwidth = 2560;
 	static int maxrenderheight = 1440;
 
-	using namespace std::chrono;
-    using dsec = duration<double>;
-    auto m_BeginFrame = system_clock::now();
-    auto m_EndFrame = m_BeginFrame + invFpsLimit;
-    unsigned frame_count_per_second = 0;
-    auto prev_time_in_seconds = time_point_cast<seconds>(m_BeginFrame);
+	std::chrono::system_clock::time_point a = std::chrono::system_clock::now();
+	std::chrono::system_clock::time_point b = std::chrono::system_clock::now();
 
 	PlayerDataManager* pdm;
 
@@ -221,24 +217,24 @@ namespace DivaHook::Components
 		//The worst framelimit/pacer ever.
 		//TODO : Destroy this thing and replace with a much better one.
 
-		auto invFpsLimit = duration_cast<system_clock::duration>(dsec{1./fps_limit});
-		auto time_in_seconds = time_point_cast<seconds>(system_clock::now());
-        ++frame_count_per_second;
-        if (time_in_seconds > prev_time_in_seconds)
-        {
-            std::cerr << frame_count_per_second << " frames per second\n";
-            frame_count_per_second = 0;
-            prev_time_in_seconds = time_in_seconds;
-        }
+		a = std::chrono::system_clock::now();
+        std::chrono::duration<double, std::milli> work_time = a - b;
 
-        // This part keeps the frame rate.
-        std::this_thread::sleep_until(m_EndFrame);
-        m_BeginFrame = m_EndFrame;
-        m_EndFrame = m_BeginFrame + invFpsLimit;
+		if (fps_limit > 30)
+		{
+        if (work_time.count() < (1000.0 / (float)fps_limit))
+        	{
+            	std::chrono::duration<double, std::milli> delta_ms(200.0 - work_time.count());
+            	auto delta_ms_duration = std::chrono::duration_cast<std::chrono::milliseconds>(delta_ms);
+				sleep = delta_ms_duration.count();
+            	std::this_thread::sleep_for(std::chrono::milliseconds(delta_ms_duration.count()));
+        	}
+        	b = std::chrono::system_clock::now();
+        	std::chrono::duration<double, std::milli> sleep_time = b - a;
+		}
 
 		fpsdiff = (1000 / (float)fps_limit) - (1000 / ImGui::GetIO().Framerate);
 		
-
 		return;
 	}
 
