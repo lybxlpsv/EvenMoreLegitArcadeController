@@ -11,6 +11,7 @@
 #include "../MainModule.h"
 #include "CustomPlayerData.h"
 #include "PlayerDataManager.h"
+#include "FrameRateManager.h"
 #include "../Components/EmulatorComponent.h"
 #include "../Components/Input/TouchPanelEmulator.h"
 #include "../Components/Input/InputEmulator.h"
@@ -51,17 +52,19 @@ namespace DivaHook::Components
 	static bool ToonShader = true;
 	static bool ToonShader2 = false;
 
+	PlayerDataManager* pdm;
+	FrameRateManager* frm;
+
 	static int maxrenderwidth = 2560;
 	static int maxrenderheight = 1440;
 	static std::chrono::time_point m_BeginFrame = system_clock::now();
 	static std::chrono::time_point prev_time_in_seconds = time_point_cast<seconds>(m_BeginFrame);
 	static unsigned frame_count_per_second = 0;
-
-	PlayerDataManager* pdm;
-
+	
 	GLComponent::GLComponent()
 	{
 		pdm = new PlayerDataManager();
+		frm = new FrameRateManager();
 	}
 
 	GLComponent::~GLComponent()
@@ -276,6 +279,7 @@ namespace DivaHook::Components
 	void GLComponent::Initialize()
 	{
 		pdm->Initialize();
+		frm->Initialize();
 		ModuleEquip1 = pdm->customPlayerData->ModuleEquip[0];
 		ModuleEquip2 = pdm->customPlayerData->ModuleEquip[1];
 		BtnSeEquip = pdm->customPlayerData->BtnSeEquip;
@@ -303,6 +307,13 @@ namespace DivaHook::Components
 
 	void GLComponent::Update()
 	{
+		frm->fps_limit = fps_limit;
+		if (fps_limit > 30)
+		{
+			frm->useFpsLimitValue = true;
+		}
+		else frm->useFpsLimitValue = false;
+
 		int* taa;
 		taa = (int*)GFX_TEMPORAL_AA;
 		if (TemporalAA)
@@ -381,6 +392,7 @@ namespace DivaHook::Components
 			pdm->playerData->act_vol = sfx_volume;
 		}
 		pdm->Update();
+		frm->Update();
 		if (firsttime > 0) firsttime = firsttime - round(GetElapsedTime());
 		return;
 	}
@@ -388,5 +400,6 @@ namespace DivaHook::Components
 	void GLComponent::UpdateInput()
 	{
 		pdm->UpdateInput();
+		frm->UpdateInput();
 	}
 }
