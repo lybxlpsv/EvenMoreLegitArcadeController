@@ -16,9 +16,6 @@ namespace DivaHook::Components
 		virtual void Update() override;
 		virtual void UpdateInput() override;
 
-		static void HookWindowFocus();
-		static void HookWindowUnFocus();
-
 	private:
 		TouchPanelState* state;
 		TouchPanelState* GetTouchStatePtr(void *address);

@@ -6,8 +6,6 @@
 
 using namespace DivaHook::Input;
 
-bool HookWindowFocused = false;
-
 namespace DivaHook::Components
 {
 	TouchPanelEmulator::TouchPanelEmulator()
@@ -33,36 +31,19 @@ namespace DivaHook::Components
 		state->ConnectionState = 1;
 	}
 
-	void TouchPanelEmulator::HookWindowFocus()
-	{
-		HookWindowFocused = true;
-	}
-
-	void TouchPanelEmulator::HookWindowUnFocus()
-	{
-		HookWindowFocused = false;
-	}
-
 	void TouchPanelEmulator::UpdateInput()
 	{
-		if (HookWindowFocused)
-		{
+		auto keyboard = Keyboard::GetInstance();
+		auto pos = Mouse::GetInstance()->GetRelativePosition();
 
-		}
-		else
-		{
-			auto keyboard = Keyboard::GetInstance();
-			auto pos = Mouse::GetInstance()->GetRelativePosition();
+		state->XPosition = (float)pos.x;
+		state->YPosition = (float)pos.y;
 
-			state->XPosition = (float)pos.x;
-			state->YPosition = (float)pos.y;
+		bool touching = keyboard->IsDown(VK_LBUTTON);
+		bool released = keyboard->IsReleased(VK_LBUTTON);
 
-			bool touching = keyboard->IsDown(VK_LBUTTON);
-			bool released = keyboard->IsReleased(VK_LBUTTON);
-
-			state->ContactType = (touching ? 0x2 : released ? 0x1 : 0x0);
-			state->Pressure = (float)(state->ContactType != 0);
-		}
+		state->ContactType = (touching ? 0x2 : released ? 0x1 : 0x0);
+		state->Pressure = (float)(state->ContactType != 0);
 	}
 
 	TouchPanelState* TouchPanelEmulator::GetTouchStatePtr(void *address)

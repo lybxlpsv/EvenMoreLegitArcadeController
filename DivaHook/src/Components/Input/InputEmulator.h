@@ -39,9 +39,6 @@ namespace DivaHook::Components
 
 		virtual void OnFocusLost() override;
 
-		static void HookWindowFocus();
-		static void HookWindowUnFocus();
-
 	private:
 		KeyBit keyBits[20] =
 		{

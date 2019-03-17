@@ -13,8 +13,6 @@
 #include "PlayerDataManager.h"
 #include "FrameRateManager.h"
 #include "../Components/EmulatorComponent.h"
-#include "../Components/Input/TouchPanelEmulator.h"
-#include "../Components/Input/InputEmulator.h"
 
 #include <chrono>
 #include <thread>
@@ -173,8 +171,6 @@ namespace DivaHook::Components
 			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-			DivaHook::Components::TouchPanelEmulator::HookWindowFocus();
-			DivaHook::Components::InputEmulator::HookWindowFocus();
 			ImGui::Begin("DivaHook Config", &showui, window_flags);
 			if (ImGui::CollapsingHeader("Modules and Custom Skins/Sounds"))
 			{
@@ -219,8 +215,7 @@ namespace DivaHook::Components
 		}
 		else
 		{
-			DivaHook::Components::TouchPanelEmulator::HookWindowUnFocus();
-			DivaHook::Components::InputEmulator::HookWindowUnFocus();
+
 		}
 		// Rendering
 		ImGui::Render();
