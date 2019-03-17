@@ -48,9 +48,6 @@ namespace DivaHook::Components
 	static int maxrenderwidth = 2560;
 	static int maxrenderheight = 1440;
 
-	std::chrono::system_clock::time_point a = std::chrono::system_clock::now();
-	std::chrono::system_clock::time_point b = std::chrono::system_clock::now();
-
 	PlayerDataManager* pdm;
 
 	GLComponent::GLComponent()
@@ -217,24 +214,35 @@ namespace DivaHook::Components
 		//The worst framelimit/pacer ever.
 		//TODO : Destroy this thing and replace with a much better one.
 
-		a = std::chrono::system_clock::now();
-        std::chrono::duration<double, std::milli> work_time = a - b;
-
-		if (fps_limit > 30)
+		if (fpsdiff > 0)
 		{
-        if (work_time.count() < (1000.0 / (float)fps_limit))
-        	{
-            	std::chrono::duration<double, std::milli> delta_ms(200.0 - work_time.count());
-            	auto delta_ms_duration = std::chrono::duration_cast<std::chrono::milliseconds>(delta_ms);
-				sleep = delta_ms_duration.count();
-            	std::this_thread::sleep_for(std::chrono::milliseconds(delta_ms_duration.count()));
-        	}
-        	b = std::chrono::system_clock::now();
-        	std::chrono::duration<double, std::milli> sleep_time = b - a;
+			if (fpsdiff > 4) sleep = sleep + 0.02f;
+			if (fpsdiff > 3) sleep = sleep + 0.01f;
+			if (fpsdiff > 2) sleep = sleep + 0.01f;
+			if (fpsdiff > 1) sleep = sleep + 0.0075f;
+			if (fpsdiff > 0.5) sleep = sleep + 0.005f;
+			sleep = sleep + 0.005f;
+		}
+		else {
+			if (sleep > 0) {
+				if (fpsdiff < -4) sleep = sleep - 0.02f;
+				if (fpsdiff < -3) sleep = sleep - 0.01f;
+				if (fpsdiff < -2) sleep = sleep - 0.01f;
+				if (fpsdiff < -1) sleep = sleep - 0.0075f;
+				if (fpsdiff < -0.5) sleep = sleep - 0.005f;
+				sleep = sleep - 0.005f;
+			}
+			else sleep = 0;
 		}
 
 		fpsdiff = (1000 / (float)fps_limit) - (1000 / ImGui::GetIO().Framerate);
-		
+		if (fps_limit > 30)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds((int)sleep));
+			
+		}
+		else sleep = 0;
+
 		return;
 	}
 
