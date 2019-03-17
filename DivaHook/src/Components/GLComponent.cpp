@@ -135,7 +135,6 @@ namespace DivaHook::Components
 			ImGui::SetWindowSize(ImVec2(100, 70));
 			ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 			ImGui::Text("FT: %.1fms", 1000 / ImGui::GetIO().Framerate);
-			ImGui::Text("SLP: %.1fms", sleep);
 			ImGui::End();
 		}
 
@@ -223,8 +222,8 @@ namespace DivaHook::Components
 
 		if (fps_limit_set != fps_limit)
 		{
-			std::chrono::time_point m_BeginFrame = system_clock::now();
-			std::chrono::time_point prev_time_in_seconds = time_point_cast<seconds>(m_BeginFrame);
+			m_BeginFrame = system_clock::now();
+			prev_time_in_seconds = time_point_cast<seconds>(m_BeginFrame);
 			frame_count_per_second = 0;
 			fps_limit = fps_limit_set;
 		}
@@ -361,9 +360,7 @@ namespace DivaHook::Components
 				VirtualProtect((BYTE*)0x006EE6F8, 2, oldProtect, &bck);
 				ToonShader2 = !ToonShader2;
 			}
-
 		}
-
 		pdm->customPlayerData->ModuleEquip[0] = ModuleEquip1;
 		pdm->customPlayerData->ModuleEquip[1] = ModuleEquip2;
 		pdm->customPlayerData->BtnSeEquip = BtnSeEquip;
@@ -380,7 +377,6 @@ namespace DivaHook::Components
 		}
 		pdm->Update();
 		if (firsttime > 0) firsttime = firsttime - round(GetElapsedTime());
-		//fps = 1000 / GetElapsedTime(); this takes alot of cpu :(
 		return;
 	}
 
