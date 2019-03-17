@@ -12,6 +12,8 @@
 #include "CustomPlayerData.h"
 #include "PlayerDataManager.h"
 #include "FrameRateManager.h"
+#include "Input/InputEmulator.h"
+#include "Input/TouchPanelEmulator.h"
 #include "../Components/EmulatorComponent.h"
 
 #include <chrono>
@@ -52,6 +54,8 @@ namespace DivaHook::Components
 
 	PlayerDataManager* pdm;
 	FrameRateManager* frm;
+	InputEmulator* inp;
+	TouchPanelEmulator* tch;
 
 	static int maxrenderwidth = 2560;
 	static int maxrenderheight = 1440;
@@ -63,6 +67,8 @@ namespace DivaHook::Components
 	{
 		pdm = new PlayerDataManager();
 		frm = new FrameRateManager();
+		inp = new InputEmulator();
+		tch = new TouchPanelEmulator();
 	}
 
 	GLComponent::~GLComponent()
@@ -276,6 +282,9 @@ namespace DivaHook::Components
 	{
 		pdm->Initialize();
 		frm->Initialize();
+		tch->Initialize();
+		inp->Initialize();
+
 		ModuleEquip1 = pdm->customPlayerData->ModuleEquip[0];
 		ModuleEquip2 = pdm->customPlayerData->ModuleEquip[1];
 		BtnSeEquip = pdm->customPlayerData->BtnSeEquip;
@@ -309,7 +318,7 @@ namespace DivaHook::Components
 			frm->useFpsLimitValue = true;
 		}
 		else frm->useFpsLimitValue = false;
-
+				
 		int* taa;
 		taa = (int*)GFX_TEMPORAL_AA;
 		if (TemporalAA)
@@ -389,6 +398,13 @@ namespace DivaHook::Components
 		}
 		pdm->Update();
 		frm->Update();
+
+		if (!showui)
+		{
+			tch->Update();
+			inp->Update();
+		}
+
 		if (firsttime > 0) firsttime = firsttime - round(GetElapsedTime());
 		return;
 	}
@@ -397,5 +413,10 @@ namespace DivaHook::Components
 	{
 		pdm->UpdateInput();
 		frm->UpdateInput();
+		if (!showui)
+		{
+			inp->UpdateInput();
+			tch->UpdateInput();
+		}
 	}
 }
