@@ -240,12 +240,12 @@ namespace DivaHook::Components
 		auto invFpsLimit = round<system_clock::duration>(dsec{ 1. / fpsLimit });
 		auto mEndFrame = mBeginFrame + invFpsLimit;
 
-		auto time_in_seconds = time_point_cast<seconds>(system_clock::now());
+		auto timeInSeconds = time_point_cast<seconds>(system_clock::now());
 		++frameCountPerSecond;
-		if (time_in_seconds > prevTimeInSeconds)
+		if (timeInSeconds > prevTimeInSeconds)
 		{
 			frameCountPerSecond = 0;
-			prevTimeInSeconds = time_in_seconds;
+			prevTimeInSeconds = timeInSeconds;
 		}
 
 		// This part keeps the frame rate.
