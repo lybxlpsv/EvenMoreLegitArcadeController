@@ -6,7 +6,7 @@ Also most of the new things here is spaghetti-code quality. ![:slowpoke:](https:
 
 Any contributions are welcome, including those not in our todo list. You can take a look at our to-do list [here](https://github.com/lybxlpsv/EvenMoreLegitArcadeController/issues/12).
 
-Currently Added features : Framebuffer scaling, In-game Overlay
+Currently Added features : Framebuffer scaling, In-game Overlay, [Arbitrary Resolution](https://github.com/lybxlpsv/EvenMoreLegitArcadeController/wiki/Arbitrary-Resolution)
 
 # Even More Legit Arcade Controller (ELAC)
 A collection of emulation components written in C++ for the purpose of operating Project DIVA Arcade on unintended hardware and generally improve the user experience.
