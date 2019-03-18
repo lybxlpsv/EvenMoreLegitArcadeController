@@ -307,6 +307,9 @@
     <Text Include="rom\keyconfig.txt">
       <Filter>Header Files</Filter>
     </Text>
+    <Text Include="..\Prepatch\rom\patch.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="rom\keyconfig.ini">
@@ -316,6 +319,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="rom\components.ini">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="rom\resolution.ini">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

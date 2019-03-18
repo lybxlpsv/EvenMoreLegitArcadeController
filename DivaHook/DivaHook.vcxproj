@@ -195,12 +195,14 @@
     <ClCompile Include="src\Utilities\Vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="..\Prepatch\rom\patch.txt" />
     <Text Include="rom\keyconfig.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="rom\components.ini" />
     <None Include="rom\keyconfig.ini" />
     <None Include="rom\playerdata.ini" />
+    <None Include="rom\resolution.ini" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

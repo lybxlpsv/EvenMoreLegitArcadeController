@@ -65,7 +65,7 @@ COORD GetConsoleCursorPosition(HANDLE hConsoleOutput)
 	return cbsi.dwCursorPosition;
 }
 
-void WaitExit(int duration = 6000, int iterations = 32 + 1)
+void WaitExit(int duration = 1000, int iterations = 32 + 1)
 {
 	DWORD interval = duration / iterations;
 
@@ -96,6 +96,26 @@ bool DoesFileExist(std::string filePath)
 	return fileAttrib != INVALID_FILE_ATTRIBUTES;
 }
 
+HANDLE Startpausedprocess(char* cmd, PHANDLE ptr_thread) // cleaned up a bit, but no RAII
+{
+	if (ptr_thread == nullptr) return nullptr;
+
+	PROCESS_INFORMATION pi;
+	STARTUPINFOA si{}; // initialize with zeroes.
+	si.cb = sizeof(STARTUPINFOA);
+
+	if (!CreateProcessA(nullptr, cmd, nullptr, nullptr, false, CREATE_SUSPENDED,
+		nullptr, nullptr, std::addressof(si), std::addressof(pi)))
+	{
+		std::cerr << "CreateProcess failed, " << GetLastError() << '\n';
+		*ptr_thread = nullptr;
+		return nullptr;
+	}
+
+	*ptr_thread = pi.hThread;
+	return pi.hProcess;
+}
+
 int main(int argc, char** argv)
 {
 	PrintProgramInfo();
@@ -114,19 +134,47 @@ int main(int argc, char** argv)
 	{
 		printf("main(): %s successfully located\n", DIVA_HOOK_DLL_NAME.c_str());
 	}
-
+	
 	Injection::DllInjector injector;
 	bool result = injector.InjectDll(DIVA_PROCESS_NAME, dllPath);
-
+	
 	if (!result)
 	{
-		printf("main(): Injection failed. Press enter to exit...");
-		std::cin.get();
-		return EXIT_FAILURE;
+		printf("main(): Injection failed. Launching...\n");
+		
+		char buffer[256];
+		for (int i = 1; i < argc; ++i)
+		{
+			if (i == 1)
+				strncpy_s(buffer, argv[i], sizeof(buffer));
+			else strncat_s(buffer, argv[i], sizeof(buffer));
+		}
+		printf(buffer);
+		HANDLE thread = nullptr;
+		auto process = Startpausedprocess(buffer, std::addressof(thread));
+
+		bool result = injector.InjectDll(DIVA_PROCESS_NAME, dllPath);
+		if (!result)
+		{
+			printf("main(): Injection failed. Exiting...");
+			return EXIT_FAILURE;
+		}
+
+		printf("main(): Exiting ");
+
+		WaitExit();
+
+		ResumeThread(thread);
+
+		CloseHandle(thread);
+		CloseHandle(process);
+	}
+	else {
+		printf("main(): Exiting ");
+
+		WaitExit();
 	}
 
-	printf("main(): Exiting ");
-
-	WaitExit();
+	
 	return EXIT_SUCCESS;
 }

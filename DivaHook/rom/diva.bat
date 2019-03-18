@@ -1,3 +1,3 @@
 start diva.exe
-timeout /t 5
+timout /t 5
 elac.exe

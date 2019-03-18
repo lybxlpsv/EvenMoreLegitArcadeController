@@ -27,7 +27,7 @@ namespace Injection
 		printf("DllInjector::GetProcessID(): Process %s not found\n", processName.c_str());
 		return NULL;
 	}
-
+	
 	bool DllInjector::InjectDll(const int &processId, const std::string &dllPath)
 	{
 		long dllSize = dllPath.length() + 1;
