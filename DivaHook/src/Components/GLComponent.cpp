@@ -90,6 +90,9 @@ namespace DivaHook::Components
 		int* fbWidth = (int*)FB_RESOLUTION_WIDTH_ADDRESS;
 		int* fbHeight = (int*)FB_RESOLUTION_HEIGHT_ADDRESS;
 
+		if (*fbWidth > maxRenderWidth) *fbWidth = maxRenderWidth;
+		if (*fbHeight > maxRenderHeight) *fbHeight = maxRenderHeight;
+
 		if ((keyboard->IsDown(VK_CONTROL)) && (keyboard->IsDown(VK_LSHIFT)) && (keyboard->IsTapped(VK_BACK)))
 		{
 			if (showUi) { showUi = false; showUi2 = false; }
@@ -188,8 +191,8 @@ namespace DivaHook::Components
 			}
 			if (ImGui::CollapsingHeader("Internal Resolution")) 
 			{
-				ImGui::SliderInt("Resolution Width", fbWidth, 640, maxRenderWidth);
-				ImGui::SliderInt("Resolution Height", fbHeight, 360, maxRenderHeight);
+				ImGui::InputInt("Resolution Width", fbWidth);
+				ImGui::InputInt("Resolution Height", fbHeight);
 			}
 			if (ImGui::CollapsingHeader("Framerate"))
 			{
