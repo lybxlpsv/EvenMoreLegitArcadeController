@@ -132,7 +132,7 @@ namespace DivaHook::Components
 			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
 			ImGui::Begin("ELAC", &p_open, window_flags);
 			ImGui::SetWindowPos(ImVec2(0, 0));
-			ImGui::Text("Press Ctrl+LShift+Backspace or Select in your Gamepad to show/hide UI.");
+			ImGui::Text("Press Ctrl+LShift+Backspace or Select/Back/Share in your Gamepad to show/hide UI.");
 			ImGui::End();
 		}
 
