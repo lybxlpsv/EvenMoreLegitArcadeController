@@ -65,6 +65,9 @@ namespace DivaHook::Components
 	static std::chrono::time_point prevTimeInSeconds = time_point_cast<seconds>(mBeginFrame);
 	static unsigned frameCountPerSecond = 0;
 	
+	static bool resetGame = false;
+	static bool resetGameUi = false;
+
 	GLComponent::GLComponent()
 	{
 		pdm = new PlayerDataManager();
@@ -175,6 +178,22 @@ namespace DivaHook::Components
 			ImGui::End();
 		}
 
+		if (resetGameUi)
+		{
+			ImGuiWindowFlags window_flags = 0;
+			window_flags |= ImGuiWindowFlags_NoMove;
+			window_flags |= ImGuiWindowFlags_NoResize;
+			window_flags |= ImGuiWindowFlags_NoCollapse;
+			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+			io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+			ImGui::Begin("Reset Game", &showAbout, window_flags);
+			ImGui::Text("Would you like to reset game?");
+			if (ImGui::Button("No")) { resetGameUi = false; };
+			if (ImGui::Button("Yes")) { resetGame = true; resetGameUi = false; showUi = false; showAbout = false; };
+			ImGui::End();
+		}
+
 		if (showUi) {
 			ImGui::SetNextWindowBgAlpha(uiTransparency);
 			ImGuiWindowFlags window_flags = 0;
@@ -221,12 +240,9 @@ namespace DivaHook::Components
 				ImGui::Checkbox("Framerate Overlay", &showFps);
 			}
 			if (ImGui::Button("Close")) { showUi = false; }; ImGui::SameLine();
+			if (ImGui::Button("Reset")) { resetGameUi = true; }; ImGui::SameLine();
 			if (ImGui::Button("About")) { showAbout = true; } ImGui::SameLine();
 			ImGui::End();
-		}
-		else
-		{
-
 		}
 		// Rendering
 		ImGui::Render();
@@ -352,6 +368,18 @@ namespace DivaHook::Components
 
 	void GLComponent::Update()
 	{
+
+		if (resetGame)
+		{
+			resetGame = false;
+			typedef void ChangeGameState(GameState);
+			ChangeGameState* changeBaseState = (ChangeGameState*)CHANGE_MODE_ADDRESS;
+
+			typedef void ChangeLogGameState(GameState, SubGameState);
+			ChangeLogGameState* changeSubState = (ChangeLogGameState*)CHANGE_SUB_MODE_ADDRESS;
+			changeBaseState(GS_GAME);
+		}
+
 		frm->fpsLimit = fpsLimit;
 		if (fpsLimit > 19)
 		{
