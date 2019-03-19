@@ -374,9 +374,6 @@ namespace DivaHook::Components
 			resetGame = false;
 			typedef void ChangeGameState(GameState);
 			ChangeGameState* changeBaseState = (ChangeGameState*)CHANGE_MODE_ADDRESS;
-
-			typedef void ChangeLogGameState(GameState, SubGameState);
-			ChangeLogGameState* changeSubState = (ChangeLogGameState*)CHANGE_SUB_MODE_ADDRESS;
 			changeBaseState(GS_GAME);
 		}
 
