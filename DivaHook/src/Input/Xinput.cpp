@@ -93,6 +93,12 @@ namespace DivaHook::Input
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_START)
 						currentState.KeyStates[i] = true;
 				}
+
+				if ((int)i == 0xF0)
+				{
+					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK)
+						currentState.KeyStates[i] = true;
+				}
 				KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
 			}
 		}

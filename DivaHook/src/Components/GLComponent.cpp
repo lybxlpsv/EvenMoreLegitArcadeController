@@ -6,6 +6,7 @@
 #include "GameState.h"
 #include "PlayerData.h"
 #include "../Input/Keyboard.h"
+#include "../Input/Xinput.h"
 #include "../Constants.h"
 #include "wtypes.h"
 #include "../MainModule.h"
@@ -81,6 +82,7 @@ namespace DivaHook::Components
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		auto keyboard = DivaHook::Input::Keyboard::GetInstance();
+		auto xinput = DivaHook::Input::Xinput::GetInstance();
 		io.MouseDown[0] = keyboard->IsDown(VK_LBUTTON);
 		io.MouseDown[1] = keyboard->IsDown(VK_RBUTTON);
 		io.MouseDown[2] = keyboard->IsDown(VK_MBUTTON);
@@ -94,7 +96,7 @@ namespace DivaHook::Components
 		if (*fbWidth > maxRenderWidth) *fbWidth = maxRenderWidth;
 		if (*fbHeight > maxRenderHeight) *fbHeight = maxRenderHeight;
 
-		if ((keyboard->IsDown(VK_CONTROL)) && (keyboard->IsDown(VK_LSHIFT)) && (keyboard->IsTapped(VK_BACK)))
+		if (((keyboard->IsDown(VK_CONTROL)) && (keyboard->IsDown(VK_LSHIFT)) && (keyboard->IsTapped(VK_BACK))) || (xinput->IsTapped(0xF0)))
 		{
 			if (showUi) { showUi = false; showUi2 = false; }
 			else showUi = true;
@@ -130,7 +132,7 @@ namespace DivaHook::Components
 			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
 			ImGui::Begin("ELAC", &p_open, window_flags);
 			ImGui::SetWindowPos(ImVec2(0, 0));
-			ImGui::Text("Press Ctrl+LShift+Backspace to show/hide UI.");
+			ImGui::Text("Press Ctrl+LShift+Backspace or Select in your Gamepad to show/hide UI.");
 			ImGui::End();
 		}
 
