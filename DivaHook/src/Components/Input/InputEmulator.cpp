@@ -5,6 +5,8 @@
 #include "../../MainModule.h"
 #include "../../Input/Mouse.h"
 #include "../../Input/Keyboard.h"
+#include "../../Input/Xinput.h"
+#include "../../Input/XinputBinding.h"
 #include "../../Input/KeyboardBinding.h"
 #include "../../Input/Binding.h"
 #include "../../Input/KeyConfig/Config.h"
@@ -107,6 +109,7 @@ namespace DivaHook::Components
 
 		auto keyboard = Keyboard::GetInstance();
 		auto mouse = Mouse::GetInstance();
+		auto Xinput = Xinput::GetInstance();
 
 		auto pos = mouse->GetRelativePosition();
 		inputState->MouseX = (int)pos.x;

@@ -2,6 +2,7 @@
 #include "IInputDevice.h"
 #include <xinput.h>
 #include "../Utilities/Stopwatch.h"
+#include "XinputState.h"
 
 namespace DivaHook::Input
 {
@@ -17,14 +18,19 @@ namespace DivaHook::Input
 		bool IsUp(BYTE keycode);
 		bool IsTapped(BYTE keycode);
 		bool IsReleased(BYTE keycode);
-
+		bool IsDoubleTapped(BYTE keycode);
 		bool WasDown(BYTE keycode);
 		bool WasUp(BYTE keycode);
 
 	private:
 		Xinput();
-		XINPUT_STATE lastState;
-		XINPUT_STATE currentState;
+		XinputState lastState;
+		XinputState currentState;
+
+		XINPUT_STATE state;
+
+		BYTE KeyDoubleTapStates[255];
+		Utilities::Stopwatch KeyDoubleTapWatches[255];
 
 		static Xinput* instance;
 	};

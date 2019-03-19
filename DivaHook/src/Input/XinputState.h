@@ -3,11 +3,9 @@
 
 namespace DivaHook::Input
 {
-	const int KEYBOARD_KEYS = 0xFF;
-
 	struct XinputState
 	{
-		BYTE KeyStates[KEYBOARD_KEYS];
+		BYTE KeyStates[255];
 	
 		bool IsDown(BYTE keycode);
 	};

@@ -1,6 +1,7 @@
 #include "Config.h"
 #include "windows.h"
 #include "../KeyboardBinding.h"
+#include "../XinputBinding.h"
 #include "../../Utilities/Operations.h"
 
 namespace DivaHook::Input::KeyConfig
@@ -106,6 +107,7 @@ namespace DivaHook::Input::KeyConfig
 			if (key.length() == 1)
 			{
 				bindObj.AddBinding(new KeyboardBinding(key[0]));
+				bindObj.AddBinding(new XinputBinding(key[0]));
 			}
 			else // for special key names
 			{
@@ -115,6 +117,7 @@ namespace DivaHook::Input::KeyConfig
 				if (keycode != Config::Keymap.end())
 				{
 					bindObj.AddBinding(new KeyboardBinding(keycode->second));
+					bindObj.AddBinding(new XinputBinding(keycode->second));
 				}
 				else
 				{
