@@ -321,7 +321,7 @@
     <None Include="rom\components.ini">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="rom\resolution.ini">
+    <None Include="rom\graphics.ini">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

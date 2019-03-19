@@ -298,6 +298,7 @@ namespace DivaHook::Components
 		}
 
 		if (success) {
+			std::string trueString = "1";
 			std::string *value;
 			if (resolutionConfig.TryGetValue("fpsLimit", value))
 			{
@@ -314,6 +315,11 @@ namespace DivaHook::Components
 			if (resolutionConfig.TryGetValue("toonShaderWorkaround", value))
 			{
 				toonShader = std::stoi(*value);
+			}
+			if (resolutionConfig.TryGetValue("showFps", value))
+			{
+				if (*value == trueString)
+					showFps = true;
 			}
 		}
 
