@@ -303,6 +303,18 @@ namespace DivaHook::Components
 			{
 				fpsLimitSet = std::stoi(*value);
 			}
+			if (resolutionConfig.TryGetValue("MLAA", value))
+			{
+				morphologicalAA = std::stoi(*value);
+			}
+			if (resolutionConfig.TryGetValue("TAA", value))
+			{
+				temporalAA = std::stoi(*value);
+			}
+			if (resolutionConfig.TryGetValue("toonShaderWorkaround", value))
+			{
+				toonShader = std::stoi(*value);
+			}
 		}
 
 		moduleEquip1 = pdm->customPlayerData->ModuleEquip[0];
