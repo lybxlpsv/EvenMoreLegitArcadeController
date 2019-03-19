@@ -188,6 +188,7 @@ namespace DivaHook::Components
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 			ImGui::Begin("Reset Game", &showAbout, window_flags);
+			ImGui::SetWindowPos(ImVec2((hWindow.right / 2) - 100, (hWindow.bottom / 2) - 50));
 			ImGui::Text("Would you like to reset game?");
 			if (ImGui::Button("No")) { resetGameUi = false; };
 			if (ImGui::Button("Yes")) { resetGame = true; resetGameUi = false; showUi = false; showAbout = false; };
