@@ -2,7 +2,7 @@
 Also most of the new things here is spaghetti-code quality. ![:slowpoke:](https://cdn.discordapp.com/emojis/531734661865668628.png)
 
 
-[Download binaries here](https://ci.appveyor.com/api/projects/lybxlpsv/evenmorelegitarcadecontroller/artifacts/release.zip?branch=experimental) [![Build status](https://ci.appveyor.com/api/projects/status/github/lybxlpsv/evenmorelegitarcadecontroller?svg=true)](https://ci.appveyor.com/project/lybxlpsv/evenmorelegitarcadecontroller)
+[Download binaries here (Updated every Git Commit) ](https://ci.appveyor.com/api/projects/lybxlpsv/evenmorelegitarcadecontroller/artifacts/release.zip?branch=experimental) [![Build status](https://ci.appveyor.com/api/projects/status/github/lybxlpsv/evenmorelegitarcadecontroller?svg=true)](https://ci.appveyor.com/project/lybxlpsv/evenmorelegitarcadecontroller)
 
 Any contributions are welcome, including those not in our todo list. You can take a look at our to-do list [here](https://github.com/lybxlpsv/EvenMoreLegitArcadeController/issues/12).
 
