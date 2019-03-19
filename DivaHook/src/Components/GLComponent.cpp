@@ -15,6 +15,7 @@
 #include "Input/InputEmulator.h"
 #include "Input/TouchPanelEmulator.h"
 #include "../Components/EmulatorComponent.h"
+#include "../FileSystem/ConfigFile.h"
 
 #include <chrono>
 #include <thread>
@@ -280,12 +281,29 @@ namespace DivaHook::Components
 		return "gl_component";
 	}
 
+	const std::string RESOLUTION_CONFIG_FILE_NAME = "graphics.ini";
+
 	void GLComponent::Initialize()
 	{
 		pdm->Initialize();
 		frm->Initialize();
 		tch->Initialize();
 		inp->Initialize();
+
+		DivaHook::FileSystem::ConfigFile resolutionConfig(MainModule::GetModuleDirectory(), RESOLUTION_CONFIG_FILE_NAME.c_str());
+		bool success = resolutionConfig.OpenRead();
+		if (!success)
+		{
+			printf("GLComponent: Unable to parse %s\n", RESOLUTION_CONFIG_FILE_NAME.c_str());
+		}
+
+		if (success) {
+			std::string *value;
+			if (resolutionConfig.TryGetValue("fpsLimit", value))
+			{
+				fpsLimitSet = std::stoi(*value);
+			}
+		}
 
 		moduleEquip1 = pdm->customPlayerData->ModuleEquip[0];
 		moduleEquip2 = pdm->customPlayerData->ModuleEquip[1];
