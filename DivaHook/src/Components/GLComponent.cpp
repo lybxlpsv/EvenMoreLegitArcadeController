@@ -68,6 +68,7 @@ namespace DivaHook::Components
 	
 	static bool resetGame = false;
 	static bool resetGameUi = false;
+	static bool debugUi = false;
 
 	static int module1[999];
 	static int module2[999];
@@ -193,11 +194,28 @@ namespace DivaHook::Components
 			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-			ImGui::Begin("Reset Game", &showAbout, window_flags);
+			ImGui::Begin("Reset Game", &resetGameUi, window_flags);
 			ImGui::SetWindowPos(ImVec2((hWindow.right / 2) - 100, (hWindow.bottom / 2) - 50));
 			ImGui::Text("Would you like to reset game?");
 			if (ImGui::Button("No")) { resetGameUi = false; }; ImGui::SameLine();
 			if (ImGui::Button("Yes")) { resetGame = true; resetGameUi = false; showUi = false; showAbout = false; }; ImGui::SameLine();
+			ImGui::End();
+		}
+
+		if (debugUi)
+		{
+			ImGuiWindowFlags window_flags = 0;
+			window_flags |= ImGuiWindowFlags_NoResize;
+			window_flags |= ImGuiWindowFlags_NoCollapse;
+			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+			io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+			ImGui::Begin("debugUi", &debugUi, window_flags);
+			ImGui::InputInt("currentSelectedPv", &currentPv);
+			ImGui::InputInt("Module 1 ID", &moduleEquip1);
+			ImGui::InputInt("Module 2 ID", &moduleEquip2);
+			if (ImGui::Button("Close")) { debugUi = false; }; ImGui::SameLine();
+			if (ImGui::Button("CloseMainUi")) { showUi = false; }; ImGui::SameLine();
 			ImGui::End();
 		}
 
@@ -249,6 +267,7 @@ namespace DivaHook::Components
 			if (ImGui::Button("Close")) { showUi = false; }; ImGui::SameLine();
 			if (ImGui::Button("Reset")) { resetGameUi = true; }; ImGui::SameLine();
 			if (ImGui::Button("About")) { showAbout = true; } ImGui::SameLine();
+			if (ImGui::Button("Debug")) { debugUi = true; } ImGui::SameLine();
 			ImGui::End();
 		}
 		// Rendering
