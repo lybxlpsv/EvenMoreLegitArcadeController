@@ -39,6 +39,8 @@ namespace DivaHook::Input
 				{
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN)
 						currentState.KeyStates[i] = true;
+					if (state.Gamepad.bRightTrigger > 230)
+						currentState.KeyStates[i] = true;
 				}
 
 				if ((int)i == 'L')
@@ -53,11 +55,15 @@ namespace DivaHook::Input
 				{
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
 						currentState.KeyStates[i] = true;
+					if (state.Gamepad.bRightTrigger > 230)
+						currentState.KeyStates[i] = true;
 				}
 
 				if ((int)i == 'A')
 				{
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_X)
+						currentState.KeyStates[i] = true;
+					if (state.Gamepad.bRightTrigger > 230)
 						currentState.KeyStates[i] = true;
 				}
 
@@ -83,6 +89,8 @@ namespace DivaHook::Input
 				if ((int)i == 'W')
 				{
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)
+						currentState.KeyStates[i] = true;
+					if (state.Gamepad.bRightTrigger > 230)
 						currentState.KeyStates[i] = true;
 
 				}
