@@ -183,6 +183,9 @@
     <ClInclude Include="src\Input\XinputBinding.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\deps\parser.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Components\EmulatorComponent.cpp">
@@ -340,6 +343,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="rom\graphics.ini">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="rom\pv_modules.csv">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

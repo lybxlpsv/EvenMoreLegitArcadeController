@@ -17,6 +17,7 @@
 #include "Input/TouchPanelEmulator.h"
 #include "../Components/EmulatorComponent.h"
 #include "../FileSystem/ConfigFile.h"
+#include "parser.hpp"
 
 #include <chrono>
 #include <thread>
@@ -67,6 +68,11 @@ namespace DivaHook::Components
 	
 	static bool resetGame = false;
 	static bool resetGameUi = false;
+
+	static int module1[999];
+	static int module2[999];
+	static int currentPv = 0;
+	static bool fileLoaded = true;
 
 	GLComponent::GLComponent()
 	{
@@ -309,6 +315,30 @@ namespace DivaHook::Components
 		tch->Initialize();
 		inp->Initialize();
 
+		std::ifstream f("pv_modules.csv");
+		if (f.good())
+		{
+			aria::csv::CsvParser parser(f);
+			int rowNum = 0;
+			int fieldNum = 0;
+			int currentPvId = 0;
+			for (auto& row : parser) {
+				currentPvId = 999;
+				for (auto& field : row) {
+					if (fieldNum == 0)
+						currentPvId = std::stoi(field);
+					if (fieldNum == 1)
+						module1[currentPvId] = std::stoi(field);
+					if (fieldNum == 2)
+						module2[currentPvId] = std::stoi(field);
+					fieldNum++;
+				}
+				fieldNum = 0;
+				rowNum++;
+			}
+			fileLoaded = true;
+		}
+
 		DivaHook::FileSystem::ConfigFile resolutionConfig(MainModule::GetModuleDirectory(), RESOLUTION_CONFIG_FILE_NAME.c_str());
 		bool success = resolutionConfig.OpenRead();
 		if (!success)
@@ -369,6 +399,20 @@ namespace DivaHook::Components
 
 	void GLComponent::Update()
 	{
+		int *currentModule = (int*)CURRENT_SELECTED_PV;
+		if ((currentPv != *currentModule) && (fileLoaded))
+		{
+			if (module1[*currentModule] != NULL)
+			{
+				moduleEquip1 = module1[*currentModule];
+			}
+
+			if (module2[*currentModule] != NULL)
+			{
+				moduleEquip2 = module2[*currentModule];
+			}
+			currentPv = *currentModule;
+		}
 
 		if (resetGame)
 		{

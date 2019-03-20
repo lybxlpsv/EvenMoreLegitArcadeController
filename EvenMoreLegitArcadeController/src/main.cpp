@@ -55,6 +55,7 @@ void PrintProgramInfo()
 	printf("// Even More Legit Arcade Controller (ELAC) (Fork)	\n");
 	printf("// !UNOFFICIAL VERSION! DO NOT ASK ORIGINAL			\n");
 	printf("//       MAINTAINER/samyuu FOR SUPPORT!				\n");
+	printf("// Git Repo : https://git.io/fjftz					\n");
 	printf("// v.%s                            -by samyuu       \n", ELAC_VERSION);
 	printf("// -------------------------------------------------\n");
 }

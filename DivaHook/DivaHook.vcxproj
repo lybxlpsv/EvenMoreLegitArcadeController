@@ -110,6 +110,7 @@
     <ClInclude Include="..\deps\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\deps\imgui\imstb_textedit.h" />
     <ClInclude Include="..\deps\imgui\imstb_truetype.h" />
+    <ClInclude Include="..\deps\parser.hpp" />
     <ClInclude Include="src\Components\CustomPlayerData.h" />
     <ClInclude Include="src\Components\Camera.h" />
     <ClInclude Include="src\Components\CameraController.h" />
@@ -212,6 +213,7 @@
     <None Include="rom\graphics.ini" />
     <None Include="rom\keyconfig.ini" />
     <None Include="rom\playerdata.ini" />
+    <None Include="rom\pv_modules.csv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
