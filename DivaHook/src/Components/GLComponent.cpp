@@ -70,8 +70,8 @@ namespace DivaHook::Components
 	static bool resetGameUi = false;
 	static bool debugUi = false;
 
-	static int module1[999];
-	static int module2[999];
+	static int module1[1000];
+	static int module2[1000];
 	static int currentPv = 0;
 	static bool fileLoaded = true;
 
