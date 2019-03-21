@@ -334,6 +334,9 @@ namespace DivaHook::Components
 		tch->Initialize();
 		inp->Initialize();
 
+		*((int*)0x00F06290) = *((int*)0x0102C21C);
+		*((int*)0x00F0628C) = *((int*)0x0102C218);
+
 		std::ifstream f("pv_modules.csv");
 		if (f.good())
 		{
