@@ -59,7 +59,7 @@ namespace DivaHook::Input
 						currentState.KeyStates[i] = true;
 				}
 
-				if ((int)i == 'A')
+				if ((int)i == 'J')
 				{
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_X)
 						currentState.KeyStates[i] = true;
@@ -67,7 +67,7 @@ namespace DivaHook::Input
 						currentState.KeyStates[i] = true;
 				}
 
-				if ((int)i == 'J')
+				if ((int)i == 'A')
 				{
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT)
 						currentState.KeyStates[i] = true;
