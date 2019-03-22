@@ -7,7 +7,7 @@ namespace DivaHook::Input
 	{
 		bool KeyStates[0x3F];
 	
-		bool IsDown(int keycode);
+		bool IsDown(BYTE keycode);
 	};
 }
 

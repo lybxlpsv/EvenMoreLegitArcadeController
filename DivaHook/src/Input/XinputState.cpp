@@ -2,7 +2,7 @@
 
 namespace DivaHook::Input
 {
-	bool XinputState::IsDown(int keycode)
+	bool XinputState::IsDown(BYTE keycode)
 	{
 		return KeyStates[keycode];
 	}
