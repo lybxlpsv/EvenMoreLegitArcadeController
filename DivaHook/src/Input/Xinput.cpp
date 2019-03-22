@@ -1,5 +1,6 @@
 #include <windows.h>
 #include "Xinput.h"
+#include "../Constants.h"
 
 namespace DivaHook::Input
 {
@@ -24,102 +25,118 @@ namespace DivaHook::Input
 
 		if (XInputGetState(0, &state) == ERROR_SUCCESS)
 		{
-			for (BYTE i = 0; i < 255; i++)
-			{
-				currentState.KeyStates[i] = false;
-				if ((int)i == 'K')
+				BYTE i = XINPUT_A;
 				{
+					currentState.KeyStates[i] = false;
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_A)
 						currentState.KeyStates[i] = true;
-					if (state.Gamepad.bLeftTrigger > 230)
-						currentState.KeyStates[i] = true;
+					KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
 				}
 
-				if ((int)i == 'S')
+				i = XINPUT_DOWN;
 				{
+					currentState.KeyStates[i] = false;
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN)
 						currentState.KeyStates[i] = true;
-					if (state.Gamepad.bRightTrigger > 230)
-						currentState.KeyStates[i] = true;
+					KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
 				}
 
-				if ((int)i == 'L')
+				i = XINPUT_B;
 				{
+					currentState.KeyStates[i] = false;
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_B)
 						currentState.KeyStates[i] = true;
-					if (state.Gamepad.bLeftTrigger > 230)
-						currentState.KeyStates[i] = true;
+					KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
 				}
 
-				if ((int)i == 'D')
+				i = XINPUT_RIGHT;
 				{
+					currentState.KeyStates[i] = false;
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
 						currentState.KeyStates[i] = true;
-					if (state.Gamepad.bRightTrigger > 230)
-						currentState.KeyStates[i] = true;
+					KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
 				}
 
-				if ((int)i == 'J')
+				i = XINPUT_X;
 				{
+					currentState.KeyStates[i] = false;
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_X)
 						currentState.KeyStates[i] = true;
-					if (state.Gamepad.bRightTrigger > 230)
-						currentState.KeyStates[i] = true;
+					KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
 				}
 
-				if ((int)i == 'A')
+				i = XINPUT_LEFT;
 				{
+					currentState.KeyStates[i] = false;
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT)
 						currentState.KeyStates[i] = true;
-
-					if (state.Gamepad.bLeftTrigger > 230)
-						currentState.KeyStates[i] = true;
+					KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
 				}
 
-				if ((int)i == 'I')
+				i = XINPUT_Y;
 				{
+					currentState.KeyStates[i] = false;
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_Y)
 						currentState.KeyStates[i] = true;
-
-					if (state.Gamepad.bLeftTrigger > 230)
-						currentState.KeyStates[i] = true;
-
+					KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
 				}
 
-				if ((int)i == 'W')
+				i = XINPUT_UP;
 				{
+					currentState.KeyStates[i] = false;
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)
 						currentState.KeyStates[i] = true;
-					if (state.Gamepad.bRightTrigger > 230)
-						currentState.KeyStates[i] = true;
-
+					KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
 				}
 
-				if ((int)i == 'Q')
+				i = XINPUT_LS;
 				{
+					currentState.KeyStates[i] = false;
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 						currentState.KeyStates[i] = true;
+					KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
 				}
-				if ((int)i == 'E')
+
+				i = XINPUT_RS;
 				{
+					currentState.KeyStates[i] = false;
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
 						currentState.KeyStates[i] = true;
+					KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
 				}
 
-				if ((int)i == 13)
+				i = XINPUT_START;
 				{
+					currentState.KeyStates[i] = false;
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_START)
 						currentState.KeyStates[i] = true;
+					KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
 				}
 
-				if ((int)i == 0xF0)
+				i = XINPUT_BACK;
 				{
+					currentState.KeyStates[i] = false;
 					if (state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK)
 						currentState.KeyStates[i] = true;
+					KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
 				}
-				KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
+
+				i = XINPUT_LT;
+				{
+					currentState.KeyStates[i] = false;
+					if (state.Gamepad.bLeftTrigger > 230)
+						currentState.KeyStates[i] = true;
+					KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
+				}
+
+				i = XINPUT_RT;
+				{
+					currentState.KeyStates[i] = false;
+					if (state.Gamepad.bRightTrigger > 230)
+						currentState.KeyStates[i] = true;
+					KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
+				}
 			}
-		}
 	}
 
 

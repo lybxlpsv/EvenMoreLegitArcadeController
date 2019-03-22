@@ -106,7 +106,7 @@ namespace DivaHook::Components
 		if (*fbWidth > maxRenderWidth) *fbWidth = maxRenderWidth;
 		if (*fbHeight > maxRenderHeight) *fbHeight = maxRenderHeight;
 
-		if (((keyboard->IsDown(VK_CONTROL)) && (keyboard->IsDown(VK_LSHIFT)) && (keyboard->IsTapped(VK_BACK))) || (xinput->IsTapped(0xF0)))
+		if (((keyboard->IsDown(VK_CONTROL)) && (keyboard->IsDown(VK_LSHIFT)) && (keyboard->IsTapped(VK_BACK))) || (xinput->IsTapped(XINPUT_BACK)))
 		{
 			if (showUi) { showUi = false; showUi2 = false; }
 			else showUi = true;

@@ -5,9 +5,9 @@ namespace DivaHook::Input
 {
 	struct XinputState
 	{
-		BYTE KeyStates[255];
+		bool KeyStates[0x3F];
 	
-		bool IsDown(BYTE keycode);
+		bool IsDown(int keycode);
 	};
 }
 

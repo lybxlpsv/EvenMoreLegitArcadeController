@@ -29,8 +29,8 @@ namespace DivaHook::Input
 
 		XINPUT_STATE state;
 
-		BYTE KeyDoubleTapStates[255];
-		Utilities::Stopwatch KeyDoubleTapWatches[255];
+		BYTE KeyDoubleTapStates[0x3F];
+		Utilities::Stopwatch KeyDoubleTapWatches[0x3F];
 
 		static Xinput* instance;
 	};

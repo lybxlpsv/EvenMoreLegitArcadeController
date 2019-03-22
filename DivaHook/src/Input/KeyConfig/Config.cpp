@@ -3,6 +3,8 @@
 #include "../KeyboardBinding.h"
 #include "../XinputBinding.h"
 #include "../../Utilities/Operations.h"
+#include "../../Constants.h"
+#include <XInput.h>
 
 namespace DivaHook::Input::KeyConfig
 {
@@ -83,6 +85,25 @@ namespace DivaHook::Input::KeyConfig
 		{ "Escape", VK_ESCAPE },
 	};
 
+	KeycodeMap Config::XinputMap =
+	{
+		//XINPUT
+		{ "XINPUT_A", XINPUT_A},
+		{ "XINPUT_B", XINPUT_B},
+		{ "XINPUT_X", XINPUT_X},
+		{ "XINPUT_Y", XINPUT_Y},
+		{ "XINPUT_UP", XINPUT_UP},
+		{ "XINPUT_DOWN", XINPUT_DOWN},
+		{ "XINPUT_LEFT", XINPUT_LEFT},
+		{ "XINPUT_RIGHT", XINPUT_RIGHT},
+		{ "XINPUT_START", XINPUT_START},
+		{ "XINPUT_BACK", XINPUT_BACK},
+		{ "XINPUT_LS", XINPUT_LS},
+		{ "XINPUT_RS", XINPUT_RS},
+		{ "XINPUT_LT", XINPUT_LT},
+		{ "XINPUT_RT", XINPUT_RT},
+	};
+
 	void Config::BindConfigKeys(std::unordered_map<std::string, std::string> &configMap, const char *configKeyName, Binding &bindObj, std::vector<std::string> defaultKeys)
 	{
 		std::vector<std::string> keys;
@@ -107,7 +128,6 @@ namespace DivaHook::Input::KeyConfig
 			if (key.length() == 1)
 			{
 				bindObj.AddBinding(new KeyboardBinding(key[0]));
-				bindObj.AddBinding(new XinputBinding(key[0]));
 			}
 			else // for special key names
 			{
@@ -117,12 +137,22 @@ namespace DivaHook::Input::KeyConfig
 				if (keycode != Config::Keymap.end())
 				{
 					bindObj.AddBinding(new KeyboardBinding(keycode->second));
-					bindObj.AddBinding(new XinputBinding(keycode->second));
 				}
 				else
 				{
 					// printf("Bad key name!? Key: %s", key.c_str());
 				}
+
+				auto xinputKeycode = Config::XinputMap.find(key.c_str());
+				if (xinputKeycode != Config::XinputMap.end())
+				{
+					bindObj.AddBinding(new XinputBinding(xinputKeycode->second));
+				}
+				else
+				{
+					// printf("Bad key name!? Key: %s", key.c_str());
+				}
+
 			}
 		}
 	}
