@@ -154,7 +154,7 @@ int main(int argc, char** argv)
 		printf(buffer);
 		HANDLE thread = nullptr;
 		auto process = Startpausedprocess(buffer, std::addressof(thread));
-
+		SetPriorityClass(process, 0x00000080);
 		bool result = injector.InjectDll(DIVA_PROCESS_NAME, dllPath);
 		if (!result)
 		{
