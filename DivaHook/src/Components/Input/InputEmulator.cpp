@@ -91,6 +91,12 @@ namespace DivaHook::Components
 		inputState->HideCursor();
 	}
 
+	void InputEmulator::UpdateInputNoPoll()
+	{
+		for (int i = 0; i < sizeof(keyBits) / sizeof(KeyBit); i++)
+			UpdateInputBit(keyBits[i].Bit, keyBits[i].KeyCode);
+	}
+
 	void InputEmulator::UpdateInput()
 	{
 		auto tappedFunc = [](void* binding) { return ((Binding*)binding)->AnyTapped(); };

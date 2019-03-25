@@ -99,6 +99,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\deps\base64\base64.h" />
     <ClInclude Include="..\deps\imgui\GL\gl3w.h" />
     <ClInclude Include="..\deps\imgui\GL\glcorearb.h" />
     <ClInclude Include="..\deps\imgui\imconfig.h" />
@@ -158,6 +159,7 @@
     <ClInclude Include="src\FileSystem\TextFile.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\deps\base64\base64.cpp" />
     <ClCompile Include="..\deps\GL\gl3w.c" />
     <ClCompile Include="..\deps\imgui\imgui.cpp" />
     <ClCompile Include="..\deps\imgui\imgui_demo.cpp" />
@@ -210,6 +212,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="rom\components.ini" />
+    <Library Include="rom\divahook1.dl_">
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</DeploymentContent>
+    </Library>
     <None Include="rom\graphics.ini" />
     <None Include="rom\keyconfig.ini" />
     <None Include="rom\playerdata.ini" />

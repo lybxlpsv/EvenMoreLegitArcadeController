@@ -18,14 +18,19 @@
 #include "../Components/EmulatorComponent.h"
 #include "../FileSystem/ConfigFile.h"
 #include "parser.hpp"
+#include <fstream>
+#include <sstream>
 
 #include <chrono>
 #include <thread>
 
+#include <cassert>
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_opengl2.h"
 #include "imgui/imgui_impl_win32.h"
 #include "GL/gl.h"
+
+#include "base64/base64.h"
 
 namespace DivaHook::Components
 {
@@ -65,7 +70,7 @@ namespace DivaHook::Components
 	static std::chrono::time_point mBeginFrame = system_clock::now();
 	static std::chrono::time_point prevTimeInSeconds = time_point_cast<seconds>(mBeginFrame);
 	static unsigned frameCountPerSecond = 0;
-	
+
 	static bool resetGame = false;
 	static bool resetGameUi = false;
 	static bool debugUi = false;
@@ -74,6 +79,16 @@ namespace DivaHook::Components
 	static int module2[1000];
 	static int currentPv = 0;
 	static bool fileLoaded = true;
+
+	static bool recordReplay = false;
+	static bool recordReplay2 = false;
+
+	static bool playReplay = false;
+	static bool playReplay2 = false;
+
+	char chara[0x212U] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
+
+	static char lastState[255];
 
 	GLComponent::GLComponent()
 	{
@@ -127,7 +142,7 @@ namespace DivaHook::Components
 		GetClientRect(DivaHook::MainModule::DivaWindowHandle, &hWindow);
 
 		ImGui::SetNextWindowBgAlpha(uiTransparency);
-		
+
 		ImGui_ImplWin32_NewFrame();
 		ImGui_ImplOpenGL2_NewFrame();
 		ImGui::NewFrame();
@@ -214,6 +229,9 @@ namespace DivaHook::Components
 			ImGui::InputInt("currentSelectedPv", &currentPv);
 			ImGui::InputInt("Module 1 ID", &moduleEquip1);
 			ImGui::InputInt("Module 2 ID", &moduleEquip2);
+			ImGui::Checkbox("recordreplay", &recordReplay);
+			ImGui::Checkbox("playreplay", &playReplay);
+			ImGui::Text(chara);
 			if (ImGui::Button("Close")) { debugUi = false; }; ImGui::SameLine();
 			if (ImGui::Button("CloseMainUi")) { showUi = false; }; ImGui::SameLine();
 			ImGui::End();
@@ -236,11 +254,12 @@ namespace DivaHook::Components
 				ImGui::InputInt("Button SFX ID", &btnSeEquip);
 				ImGui::InputInt("HUD Skin ID", &skinEquip);
 			}
-			if (ImGui::CollapsingHeader("Internal Resolution")) 
+			if (ImGui::CollapsingHeader("Internal Resolution"))
 			{
 				ImGui::InputInt("Resolution Width", fbWidth);
 				ImGui::InputInt("Resolution Height", fbHeight);
 			}
+			if (!recordReplay)
 			if (ImGui::CollapsingHeader("Framerate"))
 			{
 				ImGui::Text("--- Set the FPS cap to 0 only if you have vsync. ---");
@@ -326,9 +345,43 @@ namespace DivaHook::Components
 	}
 
 	const std::string RESOLUTION_CONFIG_FILE_NAME = "graphics.ini";
+	static HINSTANCE hGetProcIDDLL;
+
+	typedef void(__stdcall * startReplay)(int);
+	startReplay StartReplay;
+
+	typedef void(__stdcall * writeReplay)(float, int, int);
+	writeReplay WriteReplay;
+
+	typedef void(__stdcall * stopReplay)();
+	stopReplay StopReplay;
+
+	typedef char *(__stdcall * readReplay)(int, float, int, int, float);
+	readReplay ReadReplay;
+
+	typedef void(__stdcall * initReadReplay)(int);
+	initReadReplay InitReadReplay;
 
 	void GLComponent::Initialize()
 	{
+		char dllname[] = "divahook1.dll";
+		size_t size = strlen(dllname) + 1;
+		wchar_t wtext[20];
+		size_t outSize;
+		mbstowcs_s(&outSize, wtext, size, dllname, size - 1);
+
+		hGetProcIDDLL = LoadLibrary(wtext);
+		FARPROC lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "StartReplay");
+		StartReplay = startReplay(lpfnGetProcessID);
+		lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "WriteReplay");
+		WriteReplay = writeReplay(lpfnGetProcessID);
+		lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "StopReplay");
+		StopReplay = stopReplay(lpfnGetProcessID);
+		lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "ReadReplay");
+		ReadReplay = readReplay(lpfnGetProcessID);
+		lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "InitReadReplay");
+		InitReadReplay = initReadReplay(lpfnGetProcessID);
+
 		pdm->Initialize();
 		frm->Initialize();
 		tch->Initialize();
@@ -415,8 +468,8 @@ namespace DivaHook::Components
 		ImGui_ImplWin32_Init(MainModule::DivaWindowHandle);
 		ImGui_ImplOpenGL2_Init();
 		ImGui::StyleColorsDark();
-
 		printf("GLComponent::Initialize(): Initialized\n");
+		std::cout << &inp->inputState;
 	}
 
 	void GLComponent::Update()
@@ -450,7 +503,7 @@ namespace DivaHook::Components
 			frm->useFpsLimitValue = true;
 		}
 		else frm->useFpsLimitValue = false;
-				
+
 		int* taa;
 		taa = (int*)GFX_TEMPORAL_AA;
 		if (temporalAA)
@@ -538,6 +591,26 @@ namespace DivaHook::Components
 		}
 
 		if (firstTime > 0) firstTime = firstTime - round(GetElapsedTime());
+
+		float muspos = *((float*)0x1034EC8);
+
+		if ((playReplay) && (!playReplay2))
+		{
+			inp->inputState->ClearState();
+			InitReadReplay(currentPv);
+			playReplay2 = true;
+		}
+
+		if (playReplay)
+		{
+			char* charas = ReadReplay(currentPv, muspos, inp->inputState->GetAddr(), sizeof(inp->inputState), fpsLimit);
+			strcpy_s(chara, charas);
+			inp->UpdateInputNoPoll();
+		}
+		else {
+			playReplay2 = false;
+		}
+
 		return;
 	}
 
@@ -545,10 +618,32 @@ namespace DivaHook::Components
 	{
 		pdm->UpdateInput();
 		frm->UpdateInput();
-		if (!showUi)
+		if (!showUi && !playReplay)
 		{
 			inp->UpdateInput();
 			tch->UpdateInput();
 		}
+
+		float muspos = *((float*)0x1034EC8);
+
+		if (recordReplay)
+		{
+			if (!recordReplay2)
+			{
+				StartReplay(currentPv);
+				recordReplay2 = true;
+			}
+			WriteReplay(muspos, inp->inputState->GetAddr(), sizeof(InputState));
+		}
+
+		if (!recordReplay)
+		{
+			if (recordReplay2)
+			{
+				StopReplay();
+				recordReplay2 = false;
+			}
+		}
+
 	}
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "EmulatorComponent.h"
+#include <string>
 
 namespace DivaHook::Components
 {
@@ -16,6 +17,8 @@ namespace DivaHook::Components
 		virtual void UpdateInput() override;
 		
 		double* fbAspectRatio;
+
+		std::string inputString;
 	};
 }
 
