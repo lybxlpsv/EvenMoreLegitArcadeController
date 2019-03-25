@@ -354,10 +354,8 @@
     <None Include="rom\pv_modules.csv">
       <Filter>Resource Files</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="rom\divahook1.dl_">
+    <None Include="rom\divahook1.dl_">
       <Filter>Resource Files</Filter>
-    </Library>
+    </None>
   </ItemGroup>
 </Project>

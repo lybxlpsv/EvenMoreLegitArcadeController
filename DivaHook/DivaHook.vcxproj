@@ -212,10 +212,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="rom\components.ini" />
-    <Library Include="rom\divahook1.dl_">
+    <None Include="rom\divahook1.dl_">
       <FileType>Document</FileType>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</DeploymentContent>
-    </Library>
+    </None>
     <None Include="rom\graphics.ini" />
     <None Include="rom\keyconfig.ini" />
     <None Include="rom\playerdata.ini" />
