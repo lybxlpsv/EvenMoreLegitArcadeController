@@ -9,6 +9,11 @@ namespace DivaHook::Components
 		memset(this, 0, sizeof(InputState));
 	}
 
+	int InputState::GetAddr()
+	{
+		return (int)&(*(this));
+	}
+
 	void InputState::HideCursor()
 	{
 		MouseX = INT32_MIN;

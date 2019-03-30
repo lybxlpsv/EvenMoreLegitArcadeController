@@ -39,6 +39,7 @@ namespace DivaHook::Components
 		uint8_t Padding_D0[3];
 		char Key;
 
+		int GetAddr();
 		void ClearState();
 		void HideCursor();
 		void SetBit(uint32_t bit, bool value, InputBufferType inputType);

@@ -36,8 +36,10 @@ namespace DivaHook::Components
 		virtual void Initialize() override;
 		virtual void Update() override;
 		virtual void UpdateInput() override;
-
+		virtual void UpdateInputNoPoll();
 		virtual void OnFocusLost() override;
+
+		InputState* inputState;
 
 	private:
 		KeyBit keyBits[20] =
@@ -67,8 +69,6 @@ namespace DivaHook::Components
 			{ 97, VK_MBUTTON },
 			{ 98, MK_RBUTTON },
 		};
-
-		InputState* inputState;
 
 		InputState* GetInputStatePtr(void *address);
 		JvsButtons GetJvsButtonsState(bool(*buttonTestFunc)(void*));

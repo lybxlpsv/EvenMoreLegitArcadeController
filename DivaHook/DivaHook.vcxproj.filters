@@ -186,6 +186,9 @@
     <ClInclude Include="..\deps\parser.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\deps\base64\base64.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Components\EmulatorComponent.cpp">
@@ -323,6 +326,9 @@
     <ClCompile Include="src\Input\XinputBinding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\deps\base64\base64.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="rom\keyconfig.txt">
@@ -346,6 +352,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="rom\pv_modules.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="rom\divahook1.dl_">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
