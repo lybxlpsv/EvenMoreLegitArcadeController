@@ -86,6 +86,9 @@ namespace DivaHook::Components
 	static bool playReplay = false;
 	static bool playReplay2 = false;
 
+	static int timeBeforeInit = 10000;
+	static bool initialized = false;
+
 	char chara[0x212U] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
 
 	static char lastState[255];
@@ -364,286 +367,304 @@ namespace DivaHook::Components
 
 	void GLComponent::Initialize()
 	{
-		char dllname[] = "divahook1.dll";
-		size_t size = strlen(dllname) + 1;
-		wchar_t wtext[20];
-		size_t outSize;
-		mbstowcs_s(&outSize, wtext, size, dllname, size - 1);
-
-		hGetProcIDDLL = LoadLibrary(wtext);
-		FARPROC lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "StartReplay");
-		StartReplay = startReplay(lpfnGetProcessID);
-		lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "WriteReplay");
-		WriteReplay = writeReplay(lpfnGetProcessID);
-		lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "StopReplay");
-		StopReplay = stopReplay(lpfnGetProcessID);
-		lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "ReadReplay");
-		ReadReplay = readReplay(lpfnGetProcessID);
-		lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "InitReadReplay");
-		InitReadReplay = initReadReplay(lpfnGetProcessID);
-
-		pdm->Initialize();
-		frm->Initialize();
-		tch->Initialize();
-		inp->Initialize();
-
-		*((int*)0x00F06290) = *((int*)0x0102C21C);
-		*((int*)0x00F0628C) = *((int*)0x0102C218);
-
-		std::ifstream f("pv_modules.csv");
-		if (f.good())
-		{
-			aria::csv::CsvParser parser(f);
-			int rowNum = 0;
-			int fieldNum = 0;
-			int currentPvId = 0;
-			for (auto& row : parser) {
-				currentPvId = 999;
-				for (auto& field : row) {
-					if (fieldNum == 0)
-						currentPvId = std::stoi(field);
-					if (fieldNum == 1)
-						module1[currentPvId] = std::stoi(field);
-					if (fieldNum == 2)
-						module2[currentPvId] = std::stoi(field);
-					fieldNum++;
-				}
-				fieldNum = 0;
-				rowNum++;
-			}
-			fileLoaded = true;
-		}
-
-		DivaHook::FileSystem::ConfigFile resolutionConfig(MainModule::GetModuleDirectory(), RESOLUTION_CONFIG_FILE_NAME.c_str());
-		bool success = resolutionConfig.OpenRead();
-		if (!success)
-		{
-			printf("GLComponent: Unable to parse %s\n", RESOLUTION_CONFIG_FILE_NAME.c_str());
-		}
-
-		if (success) {
-			std::string trueString = "1";
-			std::string *value;
-			if (resolutionConfig.TryGetValue("fpsLimit", value))
-			{
-				fpsLimitSet = std::stoi(*value);
-			}
-			if (resolutionConfig.TryGetValue("MLAA", value))
-			{
-				morphologicalAA = std::stoi(*value);
-			}
-			if (resolutionConfig.TryGetValue("TAA", value))
-			{
-				temporalAA = std::stoi(*value);
-			}
-			if (resolutionConfig.TryGetValue("toonShaderWorkaround", value))
-			{
-				toonShader = std::stoi(*value);
-			}
-			if (resolutionConfig.TryGetValue("showFps", value))
-			{
-				if (*value == trueString)
-					showFps = true;
-			}
-		}
-
-		moduleEquip1 = pdm->customPlayerData->ModuleEquip[0];
-		moduleEquip2 = pdm->customPlayerData->ModuleEquip[1];
-		btnSeEquip = pdm->customPlayerData->BtnSeEquip;
-		skinEquip = pdm->customPlayerData->SkinEquip;
-
-		int* fbWidth = (int*)FB_RESOLUTION_WIDTH_ADDRESS;
-		int* fbHeight = (int*)FB_RESOLUTION_HEIGHT_ADDRESS;
-
-		maxRenderHeight = *fbHeight;
-		maxRenderWidth = *fbWidth;
-
-		DWORD AddressToHook = (DWORD)GetProcAddress(GetModuleHandle(L"opengl32.dll"), "wglSwapBuffers");
-		owglSwapBuffers = Memory::JumpHook(AddressToHook, (DWORD)SwapTrampoline, 5);
-
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		io.WantCaptureKeyboard == true;
-
-		ImGui_ImplWin32_Init(MainModule::DivaWindowHandle);
-		ImGui_ImplOpenGL2_Init();
-		ImGui::StyleColorsDark();
-		printf("GLComponent::Initialize(): Initialized\n");
-		std::cout << &inp->inputState;
+		
 	}
 
 	void GLComponent::Update()
 	{
-		int *currentModule = (int*)CURRENT_SELECTED_PV;
-		if ((currentPv != *currentModule) && (fileLoaded))
-		{
-			if (module1[*currentModule] != NULL)
+		if (initialized == true) {
+
+			int *currentModule = (int*)CURRENT_SELECTED_PV;
+			if ((currentPv != *currentModule) && (fileLoaded))
 			{
-				moduleEquip1 = module1[*currentModule];
+				if (module1[*currentModule] != NULL)
+				{
+					moduleEquip1 = module1[*currentModule];
+				}
+
+				if (module2[*currentModule] != NULL)
+				{
+					moduleEquip2 = module2[*currentModule];
+				}
+				currentPv = *currentModule;
 			}
 
-			if (module2[*currentModule] != NULL)
+			if (resetGame)
 			{
-				moduleEquip2 = module2[*currentModule];
+				resetGame = false;
+				typedef void ChangeGameState(GameState);
+				ChangeGameState* changeBaseState = (ChangeGameState*)CHANGE_MODE_ADDRESS;
+				changeBaseState(GS_GAME);
 			}
-			currentPv = *currentModule;
-		}
 
-		if (resetGame)
-		{
-			resetGame = false;
-			typedef void ChangeGameState(GameState);
-			ChangeGameState* changeBaseState = (ChangeGameState*)CHANGE_MODE_ADDRESS;
-			changeBaseState(GS_GAME);
-		}
-
-		frm->fpsLimit = fpsLimit;
-		if (fpsLimit > 19)
-		{
-			frm->useFpsLimitValue = true;
-		}
-		else frm->useFpsLimitValue = false;
-
-		int* taa;
-		taa = (int*)GFX_TEMPORAL_AA;
-		if (temporalAA)
-		{
-			DWORD oldProtect, bck;
-			VirtualProtect((BYTE*)GFX_TEMPORAL_AA, 1, PAGE_EXECUTE_READWRITE, &oldProtect);
-			Memory::Write(GFX_TEMPORAL_AA, 0x01);
-			VirtualProtect((BYTE*)GFX_TEMPORAL_AA, 1, oldProtect, &bck);
-		}
-		else {
-			DWORD oldProtect, bck;
-			VirtualProtect((BYTE*)GFX_TEMPORAL_AA, 1, PAGE_EXECUTE_READWRITE, &oldProtect);
-			Memory::Write(GFX_TEMPORAL_AA, 0x00);
-			VirtualProtect((BYTE*)GFX_TEMPORAL_AA, 1, oldProtect, &bck);
-		}
-
-		if (morphologicalAA)
-		{
-			if (!morphologicalAA2) {
-				DWORD oldProtect, bck;
-				VirtualProtect((BYTE*)0x006EE6F8, 3, PAGE_EXECUTE_READWRITE, &oldProtect);
-				*((byte*)0x006EE6F8 + 0) = 0x85;
-				*((byte*)0x006EE6F8 + 1) = 0x45;
-				*((byte*)0x006EE6F8 + 2) = 0x10;
-				VirtualProtect((BYTE*)0x006EE6F8, 3, oldProtect, &bck);
-				morphologicalAA2 = true;
+			frm->fpsLimit = fpsLimit;
+			if (fpsLimit > 19)
+			{
+				frm->useFpsLimitValue = true;
 			}
-		}
-		else {
-			if (morphologicalAA2) {
-				DWORD oldProtect, bck;
-				VirtualProtect((byte*)0x006EE6F8, 3, PAGE_EXECUTE_READWRITE, &oldProtect);
-				*((byte*)0x006EE6F8 + 0) = 0x83;
-				*((byte*)0x006EE6F8 + 1) = 0xE0;
-				*((byte*)0x006EE6F8 + 2) = 0x00;
-				VirtualProtect((byte*)0x006EE6F8, 3, oldProtect, &bck);
-				morphologicalAA2 = !morphologicalAA2;
-			}
-		}
+			else frm->useFpsLimitValue = false;
 
-		if (toonShader)
-		{
-			if (!toonShader2)
+			int* taa;
+			taa = (int*)GFX_TEMPORAL_AA;
+			if (temporalAA)
 			{
 				DWORD oldProtect, bck;
-				VirtualProtect((BYTE*)0x00715B86, 2, PAGE_EXECUTE_READWRITE, &oldProtect);
-				*((byte*)0x00715B86 + 0) = 0x90;
-				*((byte*)0x00715B86 + 1) = 0x90;
-				VirtualProtect((BYTE*)0x006EE6F8, 2, oldProtect, &bck);
-				toonShader2 = true;
+				VirtualProtect((BYTE*)GFX_TEMPORAL_AA, 1, PAGE_EXECUTE_READWRITE, &oldProtect);
+				Memory::Write(GFX_TEMPORAL_AA, 0x01);
+				VirtualProtect((BYTE*)GFX_TEMPORAL_AA, 1, oldProtect, &bck);
 			}
-		}
-		else {
-			if (toonShader2)
-			{
+			else {
 				DWORD oldProtect, bck;
-				VirtualProtect((BYTE*)0x00715B86, 2, PAGE_EXECUTE_READWRITE, &oldProtect);
-				*((byte*)0x00715B86 + 0) = 0x74;
-				*((byte*)0x00715B86 + 1) = 0x0d;
-				VirtualProtect((BYTE*)0x006EE6F8, 2, oldProtect, &bck);
-				toonShader2 = !toonShader2;
+				VirtualProtect((BYTE*)GFX_TEMPORAL_AA, 1, PAGE_EXECUTE_READWRITE, &oldProtect);
+				Memory::Write(GFX_TEMPORAL_AA, 0x00);
+				VirtualProtect((BYTE*)GFX_TEMPORAL_AA, 1, oldProtect, &bck);
 			}
-		}
-		pdm->customPlayerData->ModuleEquip[0] = moduleEquip1;
-		pdm->customPlayerData->ModuleEquip[1] = moduleEquip2;
-		pdm->customPlayerData->BtnSeEquip = btnSeEquip;
-		pdm->customPlayerData->SkinEquip = skinEquip;
-		if (showUi) {
-			if (!showUi2)
+
+			if (morphologicalAA)
 			{
-				bgmVolume = pdm->playerData->hp_vol;
-				sfxVolume = pdm->playerData->act_vol;
-				showUi2 = true;
+				if (!morphologicalAA2) {
+					DWORD oldProtect, bck;
+					VirtualProtect((BYTE*)0x006EE6F8, 3, PAGE_EXECUTE_READWRITE, &oldProtect);
+					*((byte*)0x006EE6F8 + 0) = 0x85;
+					*((byte*)0x006EE6F8 + 1) = 0x45;
+					*((byte*)0x006EE6F8 + 2) = 0x10;
+					VirtualProtect((BYTE*)0x006EE6F8, 3, oldProtect, &bck);
+					morphologicalAA2 = true;
+				}
 			}
-			pdm->playerData->hp_vol = bgmVolume;
-			pdm->playerData->act_vol = sfxVolume;
-		}
-		pdm->Update();
-		frm->Update();
+			else {
+				if (morphologicalAA2) {
+					DWORD oldProtect, bck;
+					VirtualProtect((byte*)0x006EE6F8, 3, PAGE_EXECUTE_READWRITE, &oldProtect);
+					*((byte*)0x006EE6F8 + 0) = 0x83;
+					*((byte*)0x006EE6F8 + 1) = 0xE0;
+					*((byte*)0x006EE6F8 + 2) = 0x00;
+					VirtualProtect((byte*)0x006EE6F8, 3, oldProtect, &bck);
+					morphologicalAA2 = !morphologicalAA2;
+				}
+			}
 
-		if (!showUi)
-		{
-			tch->Update();
-			inp->Update();
-		}
+			if (toonShader)
+			{
+				if (!toonShader2)
+				{
+					DWORD oldProtect, bck;
+					VirtualProtect((BYTE*)0x00715B86, 2, PAGE_EXECUTE_READWRITE, &oldProtect);
+					*((byte*)0x00715B86 + 0) = 0x90;
+					*((byte*)0x00715B86 + 1) = 0x90;
+					VirtualProtect((BYTE*)0x006EE6F8, 2, oldProtect, &bck);
+					toonShader2 = true;
+				}
+			}
+			else {
+				if (toonShader2)
+				{
+					DWORD oldProtect, bck;
+					VirtualProtect((BYTE*)0x00715B86, 2, PAGE_EXECUTE_READWRITE, &oldProtect);
+					*((byte*)0x00715B86 + 0) = 0x74;
+					*((byte*)0x00715B86 + 1) = 0x0d;
+					VirtualProtect((BYTE*)0x006EE6F8, 2, oldProtect, &bck);
+					toonShader2 = !toonShader2;
+				}
+			}
+			pdm->customPlayerData->ModuleEquip[0] = moduleEquip1;
+			pdm->customPlayerData->ModuleEquip[1] = moduleEquip2;
+			pdm->customPlayerData->BtnSeEquip = btnSeEquip;
+			pdm->customPlayerData->SkinEquip = skinEquip;
+			if (showUi) {
+				if (!showUi2)
+				{
+					bgmVolume = pdm->playerData->hp_vol;
+					sfxVolume = pdm->playerData->act_vol;
+					showUi2 = true;
+				}
+				pdm->playerData->hp_vol = bgmVolume;
+				pdm->playerData->act_vol = sfxVolume;
+			}
+			pdm->Update();
+			frm->Update();
 
-		if (firstTime > 0) firstTime = firstTime - round(GetElapsedTime());
+			if (!showUi)
+			{
+				tch->Update();
+				inp->Update();
+			}
 
-		float muspos = *((float*)0x1034EC8);
+			if (firstTime > 0) firstTime = firstTime - round(GetElapsedTime());
 
-		if ((playReplay) && (!playReplay2))
-		{
-			inp->inputState->ClearState();
-			InitReadReplay(currentPv);
-			playReplay2 = true;
-		}
+			float muspos = *((float*)0x1034EC8);
 
-		if (playReplay)
-		{
-			char* charas = ReadReplay(currentPv, muspos, inp->inputState->GetAddr(), sizeof(inp->inputState), fpsLimit);
-			strcpy_s(chara, charas);
-			inp->UpdateInputNoPoll();
+			if ((playReplay) && (!playReplay2))
+			{
+				inp->inputState->ClearState();
+				InitReadReplay(currentPv);
+				playReplay2 = true;
+			}
+
+			if (playReplay)
+			{
+				char* charas = ReadReplay(currentPv, muspos, inp->inputState->GetAddr(), sizeof(inp->inputState), fpsLimit);
+				strcpy_s(chara, charas);
+				inp->UpdateInputNoPoll();
+			}
+			else {
+				playReplay2 = false;
+			}
 		}
 		else {
-			playReplay2 = false;
-		}
 
-		return;
+			if (timeBeforeInit > 0)
+			{
+				timeBeforeInit = timeBeforeInit - round(GetElapsedTime());
+			}
+
+			if ((initialized == false) && (timeBeforeInit < 0))
+			{
+				char dllname[] = "divahook1.dll";
+				size_t size = strlen(dllname) + 1;
+				wchar_t wtext[20];
+				size_t outSize;
+				mbstowcs_s(&outSize, wtext, size, dllname, size - 1);
+
+				hGetProcIDDLL = LoadLibrary(wtext);
+				FARPROC lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "StartReplay");
+				StartReplay = startReplay(lpfnGetProcessID);
+				lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "WriteReplay");
+				WriteReplay = writeReplay(lpfnGetProcessID);
+				lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "StopReplay");
+				StopReplay = stopReplay(lpfnGetProcessID);
+				lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "ReadReplay");
+				ReadReplay = readReplay(lpfnGetProcessID);
+				lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "InitReadReplay");
+				InitReadReplay = initReadReplay(lpfnGetProcessID);
+
+				pdm->Initialize();
+				frm->Initialize();
+				tch->Initialize();
+				inp->Initialize();
+
+				*((int*)0x00F06290) = *((int*)0x0102C21C);
+				*((int*)0x00F0628C) = *((int*)0x0102C218);
+
+				std::ifstream f("pv_modules.csv");
+				if (f.good())
+				{
+					aria::csv::CsvParser parser(f);
+					int rowNum = 0;
+					int fieldNum = 0;
+					int currentPvId = 0;
+					for (auto& row : parser) {
+						currentPvId = 999;
+						for (auto& field : row) {
+							if (fieldNum == 0)
+								currentPvId = std::stoi(field);
+							if (fieldNum == 1)
+								module1[currentPvId] = std::stoi(field);
+							if (fieldNum == 2)
+								module2[currentPvId] = std::stoi(field);
+							fieldNum++;
+						}
+						fieldNum = 0;
+						rowNum++;
+					}
+					fileLoaded = true;
+				}
+
+				DivaHook::FileSystem::ConfigFile resolutionConfig(MainModule::GetModuleDirectory(), RESOLUTION_CONFIG_FILE_NAME.c_str());
+				bool success = resolutionConfig.OpenRead();
+				if (!success)
+				{
+					printf("GLComponent: Unable to parse %s\n", RESOLUTION_CONFIG_FILE_NAME.c_str());
+				}
+
+				if (success) {
+					std::string trueString = "1";
+					std::string *value;
+					if (resolutionConfig.TryGetValue("fpsLimit", value))
+					{
+						fpsLimitSet = std::stoi(*value);
+					}
+					if (resolutionConfig.TryGetValue("MLAA", value))
+					{
+						morphologicalAA = std::stoi(*value);
+					}
+					if (resolutionConfig.TryGetValue("TAA", value))
+					{
+						temporalAA = std::stoi(*value);
+					}
+					if (resolutionConfig.TryGetValue("toonShaderWorkaround", value))
+					{
+						toonShader = std::stoi(*value);
+					}
+					if (resolutionConfig.TryGetValue("showFps", value))
+					{
+						if (*value == trueString)
+							showFps = true;
+					}
+				}
+
+				moduleEquip1 = pdm->customPlayerData->ModuleEquip[0];
+				moduleEquip2 = pdm->customPlayerData->ModuleEquip[1];
+				btnSeEquip = pdm->customPlayerData->BtnSeEquip;
+				skinEquip = pdm->customPlayerData->SkinEquip;
+
+				int* fbWidth = (int*)FB_RESOLUTION_WIDTH_ADDRESS;
+				int* fbHeight = (int*)FB_RESOLUTION_HEIGHT_ADDRESS;
+
+				maxRenderHeight = *fbHeight;
+				maxRenderWidth = *fbWidth;
+
+				DWORD AddressToHook = (DWORD)GetProcAddress(GetModuleHandle(L"opengl32.dll"), "wglSwapBuffers");
+				owglSwapBuffers = Memory::JumpHook(AddressToHook, (DWORD)SwapTrampoline, 5);
+
+				ImGui::CreateContext();
+				ImGuiIO& io = ImGui::GetIO(); (void)io;
+				io.WantCaptureKeyboard == true;
+
+				ImGui_ImplWin32_Init(MainModule::DivaWindowHandle);
+				ImGui_ImplOpenGL2_Init();
+				ImGui::StyleColorsDark();
+				printf("GLComponent::Initialize(): Initialized\n");
+				std::cout << &inp->inputState;
+				initialized = true;
+			}
+			return;
+		}
 	}
 
-	void GLComponent::UpdateInput()
-	{
-		pdm->UpdateInput();
-		frm->UpdateInput();
-		if (!showUi && !playReplay)
+		void GLComponent::UpdateInput()
 		{
-			inp->UpdateInput();
-			tch->UpdateInput();
-		}
-
-		float muspos = *((float*)0x1034EC8);
-
-		if (recordReplay)
-		{
-			if (!recordReplay2)
+			if (initialized)
 			{
-				StartReplay(currentPv);
-				recordReplay2 = true;
-			}
-			WriteReplay(muspos, inp->inputState->GetAddr(), sizeof(InputState));
-		}
+				pdm->UpdateInput();
+				frm->UpdateInput();
+				if (!showUi && !playReplay)
+				{
+					inp->UpdateInput();
+					tch->UpdateInput();
+				}
 
-		if (!recordReplay)
-		{
-			if (recordReplay2)
-			{
-				StopReplay();
-				recordReplay2 = false;
+				float muspos = *((float*)0x1034EC8);
+
+				if (recordReplay)
+				{
+					if (!recordReplay2)
+					{
+						StartReplay(currentPv);
+						recordReplay2 = true;
+					}
+					WriteReplay(muspos, inp->inputState->GetAddr(), sizeof(InputState));
+				}
+
+				if (!recordReplay)
+				{
+					if (recordReplay2)
+					{
+						StopReplay();
+						recordReplay2 = false;
+					}
+				}
 			}
 		}
-
 	}
-}
+
