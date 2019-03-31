@@ -86,7 +86,7 @@ namespace DivaHook::Components
 	static bool playReplay = false;
 	static bool playReplay2 = false;
 
-	static int timeBeforeInit = 10000;
+	static int timeBeforeInit = 12500;
 	static bool initialized = false;
 
 	char chara[0x212U] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
