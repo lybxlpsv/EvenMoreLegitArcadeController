@@ -3,12 +3,9 @@
 #include "InputEmulator.h"
 #include "../../Constants.h"
 #include "../../MainModule.h"
-#include "../../Input/Mouse.h"
-#include "../../Input/Keyboard.h"
-#include "../../Input/Xinput.h"
-#include "../../Input/XinputBinding.h"
-#include "../../Input/KeyboardBinding.h"
-#include "../../Input/Binding.h"
+#include "../../Input/Mouse/Mouse.h"
+#include "../../Input/Keyboard/Keyboard.h"
+#include "../../Input/Bindings/KeyboardBinding.h"
 #include "../../Input/KeyConfig/Config.h"
 #include "../../Utilities/Operations.h"
 #include "../../Utilities/EnumBitwiseOperations.h"
@@ -113,6 +110,11 @@ namespace DivaHook::Components
 		// repress held down buttons to not block input
 		inputState->Down.Buttons ^= inputState->Tapped.Buttons;
 
+		UpdateDwGuiInput();
+	}
+
+	void InputEmulator::UpdateDwGuiInput()
+	{
 		auto keyboard = Keyboard::GetInstance();
 		auto mouse = Mouse::GetInstance();
 		auto Xinput = Xinput::GetInstance();
@@ -129,6 +131,12 @@ namespace DivaHook::Components
 
 		for (int i = 0; i < sizeof(keyBits) / sizeof(KeyBit); i++)
 			UpdateInputBit(keyBits[i].Bit, keyBits[i].KeyCode);
+
+		for (int i = INPUT_TAPPED; i <= INPUT_INTERVAL_TAPPED; i++)
+		{
+			inputState->SetBit(scrollUpBit, mouse->ScrolledUp(), (InputBufferType)i);
+			inputState->SetBit(scrollDownBit, mouse->ScrolledDown(), (InputBufferType)i);
+		}
 	}
 
 	InputState* InputEmulator::GetInputStatePtr(void *address)
@@ -176,17 +184,17 @@ namespace DivaHook::Components
 
 		for (char key = '0'; key < 'Z'; key++)
 		{
-			if (keyboard->IsTapped(key))
+			if (keyboard->IsIntervalTapped(key))
 				inputKey = (upper || key < 'A') ? key : (key - caseDifference);
 		}
 
-		if (keyboard->IsTapped(VK_BACK)) 
+		if (keyboard->IsIntervalTapped(VK_BACK)) 
 			inputKey = 0x08;
 
-		if (keyboard->IsTapped(VK_TAB)) 
+		if (keyboard->IsIntervalTapped(VK_TAB))
 			inputKey = 0x09;
 
-		if (keyboard->IsTapped(VK_SPACE))
+		if (keyboard->IsIntervalTapped(VK_SPACE))
 			inputKey = 0x20;
 
 		return inputKey;
@@ -200,6 +208,6 @@ namespace DivaHook::Components
 		inputState->SetBit(bit, keyboard->IsReleased(keycode), INPUT_RELEASED);
 		inputState->SetBit(bit, keyboard->IsDown(keycode), INPUT_DOWN);
 		inputState->SetBit(bit, keyboard->IsDoubleTapped(keycode), INPUT_DOUBLE_TAPPED);
-		inputState->SetBit(bit, keyboard->IsTapped(keycode), INPUT_INTERVAL_TAPPED);
+		inputState->SetBit(bit, keyboard->IsIntervalTapped(keycode), INPUT_INTERVAL_TAPPED);
 	}
 }

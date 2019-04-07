@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include "InputState.h"
 #include "../EmulatorComponent.h"
-#include "../../Input/Binding.h"
+#include "../../Input/Bindings/Binding.h"
 
 namespace DivaHook::Components
 {
@@ -42,6 +42,9 @@ namespace DivaHook::Components
 		InputState* inputState;
 
 	private:
+		const uint32_t scrollUpBit = 99;
+		const uint32_t scrollDownBit = 100;
+
 		KeyBit keyBits[20] =
 		{
 			{ 5, VK_LEFT },
@@ -69,6 +72,10 @@ namespace DivaHook::Components
 			{ 97, VK_MBUTTON },
 			{ 98, MK_RBUTTON },
 		};
+
+		InputState* inputState;
+
+		void UpdateDwGuiInput();
 
 		InputState* GetInputStatePtr(void *address);
 		JvsButtons GetJvsButtonsState(bool(*buttonTestFunc)(void*));
