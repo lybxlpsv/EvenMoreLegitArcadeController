@@ -77,7 +77,7 @@ namespace DivaHook::Input
 		SetCursorPos(x, y);
 	}
 
-	void Mouse::PollInput()
+	bool Mouse::PollInput()
 	{
 		lastState = currentState;
 
@@ -107,8 +107,11 @@ namespace DivaHook::Input
 				scale = 1;
 			}
 
-			currentState.RelativePosition.x = ((currentState.RelativePosition.x - round(xoffset)) * *gameWidth / (hWindow.right - hWindow.left)) / scale;
-			currentState.RelativePosition.y = currentState.RelativePosition.y * *gameHeight / (hWindow.bottom - hWindow.top);
+		if (directInputMouse != nullptr)
+		{
+			if (directInputMouse->Poll())
+				currentState.MouseWheel += directInputMouse->GetMouseWheel();
 		}
+		return true;
 	}
 }

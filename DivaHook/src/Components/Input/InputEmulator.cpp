@@ -8,6 +8,7 @@
 #include "../../Input/Bindings/KeyboardBinding.h"
 #include "../../Input/Xinput/Xinput.h"
 #include "../../Input/Bindings/XinputBinding.h"
+#include "../../Input/Bindings/Ds4Binding.h"
 #include "../../Input/KeyConfig/Config.h"
 #include "../../Utilities/Operations.h"
 #include "../../Utilities/EnumBitwiseOperations.h"
@@ -101,12 +102,11 @@ namespace DivaHook::Components
 		auto tappedFunc = [](void* binding) { return ((Binding*)binding)->AnyTapped(); };
 		auto releasedFunc = [](void* binding) { return ((Binding*)binding)->AnyReleased(); };
 		auto downFunc = [](void* binding) { return ((Binding*)binding)->AnyDown(); };
-		auto doubleTapFunc = [](void* binding) { return ((Binding*)binding)->AnyDoubleTapped(); };
 
 		inputState->Tapped.Buttons = GetJvsButtonsState(tappedFunc);
 		inputState->Released.Buttons = GetJvsButtonsState(releasedFunc);
 		inputState->Down.Buttons = GetJvsButtonsState(downFunc);
-		inputState->DoubleTapped.Buttons = GetJvsButtonsState(doubleTapFunc);
+		inputState->DoubleTapped.Buttons = GetJvsButtonsState(tappedFunc);
 		inputState->IntervalTapped.Buttons = GetJvsButtonsState(tappedFunc);
 
 		// repress held down buttons to not block input

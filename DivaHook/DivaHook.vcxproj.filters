@@ -341,6 +341,16 @@
     <ClCompile Include="src\Input\DirectInput\DirectInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Input\DirectInput\Controller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\Bindings\Ds4Binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\DirectInput\Ds4\Ds4State.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\DirectInput\Ds4\DualShock4.cpp">
     <ClCompile Include="..\deps\base64\base64.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -88,6 +88,9 @@
 // Force Toon Shader (on PVs that use it) with arbitary resolutions (Higher than 720p)
 //0x00715B86 : 0x0002 : 74 0D : 90 90
 
+// Write ram files to the current directory instead of Y:/ram
+0x00800D91 : 0x0001 : 75 								: EB 
+
 // Enable dw_gui sprite draw calls
 //0x0045AD12 : 0x0001 : 02                                : 00 
 // Update the dw_gui display

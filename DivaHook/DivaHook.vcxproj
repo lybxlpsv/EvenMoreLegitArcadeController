@@ -99,6 +99,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Input\Bindings\Ds4Binding.h" />
+    <ClInclude Include="src\Input\DirectInput\Ds4\Ds4Button.h" />
+    <ClInclude Include="src\Input\DirectInput\Ds4\Ds4State.h" />
+    <ClInclude Include="src\Input\DirectInput\Ds4\DualShock4.h" />
+    <ClInclude Include="src\Input\DirectInput\Controller.h" />
     <ClInclude Include="..\deps\base64\base64.h" />
     <ClInclude Include="..\deps\imgui\GL\gl3w.h" />
     <ClInclude Include="..\deps\imgui\GL\glcorearb.h" />
@@ -163,6 +168,10 @@
     <ClInclude Include="src\FileSystem\TextFile.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Input\Bindings\Ds4Binding.cpp" />
+    <ClCompile Include="src\Input\DirectInput\Ds4\Ds4State.cpp" />
+    <ClCompile Include="src\Input\DirectInput\Ds4\DualShock4.cpp" />
+    <ClCompile Include="src\Input\DirectInput\Controller.cpp" />
     <ClCompile Include="..\deps\base64\base64.cpp" />
     <ClCompile Include="..\deps\GL\gl3w.c" />
     <ClCompile Include="..\deps\imgui\imgui.cpp" />
