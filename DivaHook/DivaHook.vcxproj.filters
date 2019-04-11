@@ -351,6 +351,8 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Input\DirectInput\Ds4\DualShock4.cpp">
+        <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\deps\base64\base64.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
