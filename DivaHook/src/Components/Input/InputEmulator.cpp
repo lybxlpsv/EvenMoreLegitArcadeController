@@ -6,6 +6,8 @@
 #include "../../Input/Mouse/Mouse.h"
 #include "../../Input/Keyboard/Keyboard.h"
 #include "../../Input/Bindings/KeyboardBinding.h"
+#include "../../Input/Xinput/Xinput.h"
+#include "../../Input/Bindings/XinputBinding.h"
 #include "../../Input/KeyConfig/Config.h"
 #include "../../Utilities/Operations.h"
 #include "../../Utilities/EnumBitwiseOperations.h"

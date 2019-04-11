@@ -73,8 +73,6 @@ namespace DivaHook::Components
 			{ 98, MK_RBUTTON },
 		};
 
-		InputState* inputState;
-
 		void UpdateDwGuiInput();
 
 		InputState* GetInputStatePtr(void *address);

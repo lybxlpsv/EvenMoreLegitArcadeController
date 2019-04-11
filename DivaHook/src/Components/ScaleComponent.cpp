@@ -4,7 +4,7 @@
 #include "Input/InputState.h"
 #include "GameState.h"
 #include "PlayerData.h"
-#include "../Input/Keyboard.h"
+#include "../Input/Keyboard/Keyboard.h"
 #include "../Constants.h"
 #include "wtypes.h"
 #include "../MainModule.h"

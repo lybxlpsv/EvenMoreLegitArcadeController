@@ -1,7 +1,7 @@
 #pragma once
-#include "IInputDevice.h"
+#include "../Bindings/IInputDevice.h"
 #include <xinput.h>
-#include "../Utilities/Stopwatch.h"
+#include "../../Utilities/Stopwatch.h"
 #include "XinputState.h"
 
 namespace DivaHook::Input
