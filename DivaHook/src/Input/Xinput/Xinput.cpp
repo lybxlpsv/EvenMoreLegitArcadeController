@@ -19,7 +19,7 @@ namespace DivaHook::Input
 		return instance;
 	}
 
-	void Xinput::PollInput()
+	bool Xinput::PollInput()
 	{
 		lastState = currentState;
 
@@ -137,6 +137,7 @@ namespace DivaHook::Input
 					KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
 				}
 			}
+			return TRUE;
 	}
 
 

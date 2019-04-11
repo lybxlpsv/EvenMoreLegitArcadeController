@@ -107,10 +107,11 @@ namespace DivaHook::Input
 				scale = 1;
 			}
 
-		if (directInputMouse != nullptr)
-		{
-			if (directInputMouse->Poll())
-				currentState.MouseWheel += directInputMouse->GetMouseWheel();
+			if (directInputMouse != nullptr)
+			{
+				if (directInputMouse->Poll())
+					currentState.MouseWheel += directInputMouse->GetMouseWheel();
+			}
 		}
 		return true;
 	}

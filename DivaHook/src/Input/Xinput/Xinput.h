@@ -1,5 +1,5 @@
 #pragma once
-#include "../Bindings/IInputDevice.h"
+#include "../IInputDevice.h"
 #include <xinput.h>
 #include "../../Utilities/Stopwatch.h"
 #include "XinputState.h"
@@ -13,7 +13,7 @@ namespace DivaHook::Input
 	public:
 		static Xinput* GetInstance();
 		
-		void PollInput() override; 
+		bool PollInput() override; 
 		bool IsDown(BYTE keycode);
 		bool IsUp(BYTE keycode);
 		bool IsTapped(BYTE keycode);
