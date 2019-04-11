@@ -1,6 +1,6 @@
 #include <windows.h>
 #include "Xinput.h"
-#include "../../Constants.h"
+#include "../Constants.h"
 
 namespace DivaHook::Input
 {

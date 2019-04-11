@@ -4,7 +4,7 @@
 # file:			patch.txt
 # author:		samyuu
 # version:		4.00.00
-# date:			2019/04/07
+# date:			2019/03/10
 # image_base:   0x00400C00
 
 // Address : Length : Original bytes                    : Patched bytes
@@ -78,7 +78,6 @@
 // Jump past the VP SelWatch button enabled checks
 0x00798108 : 0x0005 : E8 F3 01 E7 FF                    : EB 2D 90 90 90 
 
-
 // Disable Temporal AA
 //0x006E82D0 : 0x0004 : 8B 44 24 04 : 29 C0 90 90
 
@@ -88,12 +87,10 @@
 // Force Toon Shader (on PVs that use it) with arbitary resolutions (Higher than 720p)
 //0x00715B86 : 0x0002 : 74 0D : 90 90
 
-// Enable dw_gui sprite draw calls
-//0x0045AD12 : 0x0001 : 02                                : 00 
-// Update the dw_gui display
-//0x0059F150 : 0x0002 : 32 C0                             : B0 01 
-// Draw the dw_gui display
-//0x0059F160 : 0x0002 : 32 C0                             : B0 01 
+// For debug purposes
+// 0x0045AD12 : 0x0001 : 02								    : 00 
+// 0x0059F150 : 0x0002 : 32 C0								: B0 01 
+// 0x0059F160 : 0x0002 : 32 C0								: B0 01 
 
 // Use MP4 files instead of WMV files (So PVs that rely on videos can be played back without issues) (By @BesuBaru)
 // Requires mp4 files to be set in "rom/pv_db.txt"

@@ -1,8 +1,8 @@
 #include "TouchPanelEmulator.h"
+#include <iostream>
 #include "../../Constants.h"
-#include "../../Input/Mouse/Mouse.h"
-
-#define TOUCH_PANEL_CONNECTED 1
+#include "../../Input/Mouse.h"
+#include "../../Input/Keyboard.h"
 
 using namespace DivaHook::Input;
 
@@ -23,12 +23,12 @@ namespace DivaHook::Components
 
 	void TouchPanelEmulator::Initialize()
 	{
-		touchPanelState = GetTouchStatePtr((void*)TASK_TOUCH_ADDRESS);
+		state = GetTouchStatePtr((void*)TASK_TOUCH_ADDRESS);
 	}
 
 	void TouchPanelEmulator::Update()
 	{
-		touchPanelState->ConnectionState = TOUCH_PANEL_CONNECTED;
+		state->ConnectionState = 1;
 	}
 
 	void TouchPanelEmulator::UpdateInput()
@@ -36,23 +36,18 @@ namespace DivaHook::Components
 		auto keyboard = Keyboard::GetInstance();
 		auto pos = Mouse::GetInstance()->GetRelativePosition();
 
-		touchPanelState->XPosition = (float)pos.x;
-		touchPanelState->YPosition = (float)pos.y;
+		state->XPosition = (float)pos.x;
+		state->YPosition = (float)pos.y;
 
-		touchPanelState->ContactType = GetContactType(keyboard);
-		touchPanelState->Pressure = (float)(touchPanelState->ContactType != CONTACT_UP);
+		bool touching = keyboard->IsDown(VK_LBUTTON);
+		bool released = keyboard->IsReleased(VK_LBUTTON);
+
+		state->ContactType = (touching ? 0x2 : released ? 0x1 : 0x0);
+		state->Pressure = (float)(state->ContactType != 0);
 	}
 
 	TouchPanelState* TouchPanelEmulator::GetTouchStatePtr(void *address)
 	{
 		return (TouchPanelState*)address;
-	}
-
-	ContactType TouchPanelEmulator::GetContactType(Keyboard *keyboard)
-	{
-		bool down = keyboard->IsDown(VK_LBUTTON);
-		bool released = keyboard->IsReleased(VK_LBUTTON);
-
-		return (down ? CONTACT_DOWN : released ? CONTACT_RELEASED : CONTACT_UP);
 	}
 }

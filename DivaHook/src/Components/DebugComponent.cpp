@@ -4,8 +4,7 @@
 #include "Input/InputState.h"
 #include "GameState.h"
 #include "PlayerData.h"
-#include "../Input/Keyboard/Keyboard.h"
-#include "../Input/Mouse/Mouse.h"
+#include "../Input/Keyboard.h"
 #include "../Constants.h"
 
 namespace DivaHook::Components

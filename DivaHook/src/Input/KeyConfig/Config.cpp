@@ -1,7 +1,7 @@
 #include "Config.h"
 #include "windows.h"
-#include "../Bindings/KeyboardBinding.h"
-#include "../Bindings/XinputBinding.h"
+#include "../KeyboardBinding.h"
+#include "../XinputBinding.h"
 #include "../../Utilities/Operations.h"
 #include "../../Constants.h"
 #include <XInput.h>
