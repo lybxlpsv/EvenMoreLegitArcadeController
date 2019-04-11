@@ -95,6 +95,12 @@ namespace DivaHook::Input
 		fbWidth = (int*)FB1_WIDTH_ADDRESS;
 		fbHeight = (int*)FB1_HEIGHT_ADDRESS;
 		
+		if (directInputMouse != nullptr)
+		{
+			if (directInputMouse->Poll())
+				currentState.MouseWheel += directInputMouse->GetMouseWheel();
+		}
+
 		if ((fbWidth != gameWidth) && (fbHeight != gameHeight)) {
 			xoffset = ((float)16 / (float)9) * (hWindow.bottom - hWindow.top);
 			if (xoffset != (hWindow.right - hWindow.left))
@@ -106,12 +112,8 @@ namespace DivaHook::Input
 				xoffset = 0;
 				scale = 1;
 			}
-
-			if (directInputMouse != nullptr)
-			{
-				if (directInputMouse->Poll())
-					currentState.MouseWheel += directInputMouse->GetMouseWheel();
-			}
+			currentState.RelativePosition.x = ((currentState.RelativePosition.x - round(xoffset)) * *gameWidth / (hWindow.right - hWindow.left)) / scale;
+			currentState.RelativePosition.y = currentState.RelativePosition.y * *gameHeight / (hWindow.bottom - hWindow.top);
 		}
 		return true;
 	}
