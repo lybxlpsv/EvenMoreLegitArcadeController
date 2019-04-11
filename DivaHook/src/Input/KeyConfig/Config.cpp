@@ -232,16 +232,24 @@ namespace DivaHook::Input::KeyConfig
 				}
 				else
 				{
-					// just gonna be lazy for now and put this inside an else statement
-					auto ds4Button = Config::Ds4Map.find(key.c_str());
+					auto xinputBtn = Config::XinputMap.find(key.c_str());
 
-					if (ds4Button != Config::Ds4Map.end())
+					if (xinputBtn != Config::XinputMap.end())
 					{
-						bindObj.AddBinding(new Ds4Binding(ds4Button->second));
+						bindObj.AddBinding(new XinputBinding(xinputBtn->second));
 					}
-					else
-					{
-						printf("Config::BindConfigKeys(): Unable to parse key: '%s'\n", key.c_str());
+					else {
+						// just gonna be lazy for now and put this inside an else statement
+						auto ds4Button = Config::Ds4Map.find(key.c_str());
+
+						if (ds4Button != Config::Ds4Map.end())
+						{
+							bindObj.AddBinding(new Ds4Binding(ds4Button->second));
+						}
+						else
+						{
+							printf("Config::BindConfigKeys(): Unable to parse key: '%s'\n", key.c_str());
+						}
 					}
 				}
 
