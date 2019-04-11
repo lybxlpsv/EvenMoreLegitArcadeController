@@ -163,6 +163,8 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\deps\base64\base64.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\Input\Keyboard\Keyboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -313,7 +315,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Input\Bindings\XinputBinding.cpp">
-   <ClCompile Include="src\Input\Keyboard\Keyboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\Keyboard\Keyboard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Input\Keyboard\KeyboardState.cpp">
@@ -343,7 +347,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="rom\keyconfig.txt">
-      <Filter>Header Files</Filter>
+      <Filter>Resource Files</Filter>
     </Text>
     <Text Include="..\Prepatch\rom\patch.txt">
       <Filter>Resource Files</Filter>

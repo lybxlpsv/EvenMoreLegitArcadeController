@@ -112,7 +112,7 @@
     <ClInclude Include="..\deps\imgui\imstb_textedit.h" />
     <ClInclude Include="..\deps\imgui\imstb_truetype.h" />
     <ClInclude Include="..\deps\parser.hpp" />
-   <ClInclude Include="src\Components\Input\ContactType.h" />
+    <ClInclude Include="src\Components\Input\ContactType.h" />
     <ClInclude Include="src\Input\DirectInput\DirectInputMouse.h" />
     <ClInclude Include="src\Components\CustomPlayerData.h" />
     <ClInclude Include="src\Components\Camera.h" />
@@ -136,9 +136,9 @@
     <ClInclude Include="src\Input\KeyConfig\Config.h" />
     <ClInclude Include="src\Input\KeyConfig\KeyString.h" />
     <ClInclude Include="src\Input\KeyConfig\KeyStringHash.h" />
-    <ClInclude Include="src\Input\Xinput.h" />
-    <ClInclude Include="src\Input\XinputBinding.h" />
-    <ClInclude Include="src\Input\XinputState.h" />
+    <ClInclude Include="src\Input\Xinput\Xinput.h" />
+    <ClInclude Include="src\Input\Bindings\XinputBinding.h" />
+    <ClInclude Include="src\Input\Xinput\XinputState.h" />
     <ClInclude Include="src\MainModule.h" />
     <ClInclude Include="src\Input\Bindings\Binding.h" />
     <ClInclude Include="src\Input\Bindings\KeyboardBinding.h" />
@@ -189,9 +189,9 @@
     <ClCompile Include="src\Input\KeyConfig\Config.cpp" />
     <ClCompile Include="src\Input\KeyConfig\KeyString.cpp" />
     <ClCompile Include="src\Input\KeyConfig\KeyStringHash.cpp" />
-    <ClCompile Include="src\Input\Xinput.cpp" />
-    <ClCompile Include="src\Input\XinputBinding.cpp" />
-    <ClCompile Include="src\Input\XinputState.cpp" />
+    <ClCompile Include="src\Input\Xinput\Xinput.cpp" />
+    <ClCompile Include="src\Input\Bindings\XinputBinding.cpp" />
+    <ClCompile Include="src\Input\Xinput\XinputState.cpp" />
     <ClCompile Include="src\MainModule.cpp" />
     <ClCompile Include="src\Input\Bindings\Binding.cpp" />
     <ClCompile Include="src\Input\Bindings\KeyboardBinding.cpp" />
