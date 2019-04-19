@@ -22,6 +22,7 @@ namespace DivaHook::Input
 	bool Xinput::PollInput()
 	{
 		lastState = currentState;
+		ZeroMemory(&state, sizeof(XINPUT_STATE));
 
 		if (XInputGetState(0, &state) == ERROR_SUCCESS)
 		{
@@ -136,7 +137,11 @@ namespace DivaHook::Input
 						currentState.KeyStates[i] = true;
 					KeyDoubleTapStates[i] = IsTapped(i) ? KeyDoubleTapWatches[i].Restart() <= DOUBLE_TAP_THRESHOLD : false;
 				}
-			}
+		}
+		else {
+		ZeroMemory(&state, sizeof(XINPUT_STATE));
+		ZeroMemory(&currentState, sizeof(currentState));
+		}
 			return TRUE;
 	}
 

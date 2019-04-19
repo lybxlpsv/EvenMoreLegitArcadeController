@@ -367,7 +367,29 @@ namespace DivaHook::Components
 
 	void GLComponent::Initialize()
 	{
-		
+		std::ifstream f("pv_modules.csv");
+		if (f.good())
+		{
+			aria::csv::CsvParser parser(f);
+			int rowNum = 0;
+			int fieldNum = 0;
+			int currentPvId = 0;
+			for (auto& row : parser) {
+				currentPvId = 999;
+				for (auto& field : row) {
+					if (fieldNum == 0)
+						currentPvId = std::stoi(field);
+					if (fieldNum == 1)
+						module1[currentPvId] = std::stoi(field);
+					if (fieldNum == 2)
+						module2[currentPvId] = std::stoi(field);
+					fieldNum++;
+				}
+				fieldNum = 0;
+				rowNum++;
+			}
+			fileLoaded = true;
+		}
 	}
 
 	void GLComponent::Update()
@@ -545,30 +567,6 @@ namespace DivaHook::Components
 
 				*((int*)0x00F06290) = *((int*)0x0102C21C);
 				*((int*)0x00F0628C) = *((int*)0x0102C218);
-
-				std::ifstream f("pv_modules.csv");
-				if (f.good())
-				{
-					aria::csv::CsvParser parser(f);
-					int rowNum = 0;
-					int fieldNum = 0;
-					int currentPvId = 0;
-					for (auto& row : parser) {
-						currentPvId = 999;
-						for (auto& field : row) {
-							if (fieldNum == 0)
-								currentPvId = std::stoi(field);
-							if (fieldNum == 1)
-								module1[currentPvId] = std::stoi(field);
-							if (fieldNum == 2)
-								module2[currentPvId] = std::stoi(field);
-							fieldNum++;
-						}
-						fieldNum = 0;
-						rowNum++;
-					}
-					fileLoaded = true;
-				}
 
 				DivaHook::FileSystem::ConfigFile resolutionConfig(MainModule::GetModuleDirectory(), RESOLUTION_CONFIG_FILE_NAME.c_str());
 				bool success = resolutionConfig.OpenRead();
