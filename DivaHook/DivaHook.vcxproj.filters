@@ -201,6 +201,21 @@
     <ClInclude Include="src\Components\Input\ContactType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Input\Bindings\Ds4Binding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Input\DirectInput\Ds4\Ds4Button.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Input\DirectInput\Ds4\Ds4State.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Input\DirectInput\Ds4\DualShock4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Input\DirectInput\Controller.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Components\EmulatorComponent.cpp">
@@ -351,7 +366,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Input\DirectInput\Ds4\DualShock4.cpp">
-        <Filter>Source Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\deps\base64\base64.cpp">
       <Filter>Source Files</Filter>
