@@ -174,13 +174,14 @@ namespace DivaHook::Components
 
 	void CameraController::SetEye(bool eye)
 	{
-		if (eye) //RIGHT EYE xoffset
+		if (eye) //LEFT EYE xoffset
 		{
 			eyeOverride = true;
 			SetIsEnabled(eye);
 			for (int i = 0; i < sizeof(cameraSetterAddresses) / sizeof(void*); i++)
 				*(uint8_t*)cameraSetterAddresses[i] = RET_OPCODE;
-			camera->Position.X = camera->Position.X + 0.25;
+			camera->Position.X = camera->Position.X - 0.05;
+			camera->Focus.X = camera->Focus.X - 0.05;
 
 		}
 		else {
@@ -209,7 +210,7 @@ namespace DivaHook::Components
 		if (value)
 		{
 			// disable camera setters
-			for (int i = 0; i < sizeof(cameraSetterAddresses) / sizeof(void*); i++)
+			//for (int i = 0; i < sizeof(cameraSetterAddresses) / sizeof(void*); i++)
 				*(uint8_t*)cameraSetterAddresses[1] = RET_OPCODE;
 
 			// set initial camera angle

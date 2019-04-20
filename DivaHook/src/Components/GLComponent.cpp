@@ -265,7 +265,6 @@ namespace DivaHook::Components
 			{
 				writePbo(pbo1);
 				cam->SetEye(pboflag);
-				//glBufferDataARB(GL_PIXEL_PACK_BUFFER, 1280 * 720 * 4, 0, GL_STREAM_READ);
 				pbo1yay = true;
 				if (pbo2yay)
 				{
