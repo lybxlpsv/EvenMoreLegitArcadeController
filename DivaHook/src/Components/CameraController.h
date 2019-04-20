@@ -30,11 +30,14 @@ namespace DivaHook::Components
 		CameraController();
 		~CameraController();
 
+		bool eyeOverride = false;
+
 		virtual const char* GetDisplayName() override;
 
 		virtual void Initialize() override;
 		virtual void Update() override;
 		virtual void UpdateInput() override;
+		virtual void SetEye(bool eye);
 
 		void SetControls(bool value);
 

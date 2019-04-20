@@ -13,6 +13,7 @@
 #include "CustomPlayerData.h"
 #include "PlayerDataManager.h"
 #include "FrameRateManager.h"
+#include "CameraController.h"
 #include "Input/InputEmulator.h"
 #include "Input/TouchPanelEmulator.h"
 #include "../Components/EmulatorComponent.h"
@@ -65,6 +66,7 @@ namespace DivaHook::Components
 	FrameRateManager* frm;
 	InputEmulator* inp;
 	TouchPanelEmulator* tch;
+	CameraController* cam;
 
 	static int maxRenderWidth = 2560;
 	static int maxRenderHeight = 1440;
@@ -95,18 +97,31 @@ namespace DivaHook::Components
 	static char lastState[255];
 
 	GLubyte* pixels;
-	//GLubyte* pixels2;
+	GLubyte* pixels2;
+	GLubyte* pixels3;
 	static const GLenum FORMAT = GL_COMPRESSED_RGBA;
 	static const GLuint FORMAT_NBYTES = 4;
 	static bool wtf = false;
 	static bool glinit = false;
-	GLuint texture = 400000000;
-	GLuint texture2 = 400000001;
+	GLuint pbo1 = 400000000;
+	GLuint pbo2 = 400000001;
+	GLuint pbo3 = 400000003;
 	GLuint texture3 = 400000002;
 	bool pboflag = false;
 	bool pbo1yay = false;
 	bool pbo2yay = false;
+	bool pbo3yay = false;
 	GLint depth;
+	static int pboindex = 0;
+	int i1 = -1;	int i2 = 1;
+	int i3 = -1;	int i4 = 0;
+	int i5 = 0;		int i6 = 0;
+	int i7 = 0;		int i8 = 1;
+
+	int aX = 0; int aY = 0;
+	int aW = 640; int aH = 720;
+	int bX = 640; int bY = 0;
+	int bW = 640; int bH = 720;
 
 	GLComponent::GLComponent()
 	{
@@ -114,6 +129,7 @@ namespace DivaHook::Components
 		frm = new FrameRateManager();
 		inp = new InputEmulator();
 		tch = new TouchPanelEmulator();
+		cam = new CameraController();
 		//pixels2 = new GLubyte[FORMAT_NBYTES * 1280 * 720];
 		//memset(pixels2, 255, sizeof(pixels2));
 	}
@@ -144,6 +160,30 @@ namespace DivaHook::Components
 	PFNGLUNMAPBUFFERARBPROC glUnmapBufferARB;
 	PFNGLGENBUFFERSARBPROC glGenBuffersARB;
 
+	void drawPbo(GLubyte* pixels, GLint x, GLint y, GLint w, GLint h)
+	{
+		glBindTexture(GL_TEXTURE_2D, texture3);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1280, 720, 0, GL_BGR, GL_UNSIGNED_BYTE, pixels);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glEnable(GL_TEXTURE_2D);
+
+		glBegin(GL_QUADS);
+		glTexCoord2i(i1, i2); glVertex2i(x, y);
+		glTexCoord2i(i3, i4); glVertex2i(x, y + h);
+		glTexCoord2i(i5, i6); glVertex2i(x+h, y+h);
+		glTexCoord2i(i7, i8); glVertex2i(x+h, y);
+		glEnd();
+		glDisable(GL_TEXTURE_2D);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
+	}
+
 	void writePbo(GLuint pbo)
 	{
 		glBindBufferARB(GL_PIXEL_PACK_BUFFER, pbo);
@@ -159,6 +199,14 @@ namespace DivaHook::Components
 		glUnmapBufferARB(GL_PIXEL_PACK_BUFFER);
 		glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
 		return src;
+	}
+
+	void pboInit(GLuint pbo)
+	{
+		glGenBuffersARB(1, &pbo);
+		glBindBufferARB(GL_PIXEL_PACK_BUFFER, pbo);
+		glBufferDataARB(GL_PIXEL_PACK_BUFFER, 1280 * 720 * 4, 0, GL_STREAM_READ);
+		glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
 	}
 
 	void hwglSwapBuffers(_In_ HDC hDc)
@@ -177,79 +225,107 @@ namespace DivaHook::Components
 			glGenBuffersARB = (PFNGLGENBUFFERSARBPROC)wglGetProcAddress("glGenBuffersARB");
 
 			glGetIntegerv(GL_DEPTH_BITS, &depth);
-			glGenBuffersARB(1, &texture);
-			glGenBuffersARB(1, &texture2);
-			glBindBufferARB(GL_PIXEL_PACK_BUFFER, texture);
+			//pboInit(pbo1);
+			//pboInit(pbo2);
+			//pboInit(pbo3);
+			
+			glGenBuffersARB(1, &pbo1);
+			glGenBuffersARB(1, &pbo2);
+			glGenBuffersARB(1, &pbo3);
+			glBindBufferARB(GL_PIXEL_PACK_BUFFER, pbo1);
 			glBufferDataARB(GL_PIXEL_PACK_BUFFER, 1280 * 720 * 4, 0, GL_STREAM_READ);
-			glBindBufferARB(GL_PIXEL_PACK_BUFFER, texture2);
+			glBindBufferARB(GL_PIXEL_PACK_BUFFER, pbo2);
+			glBufferDataARB(GL_PIXEL_PACK_BUFFER, 1280 * 720 * 4, 0, GL_STREAM_READ);
+			glBindBufferARB(GL_PIXEL_PACK_BUFFER, pbo3);
 			glBufferDataARB(GL_PIXEL_PACK_BUFFER, 1280 * 720 * 4, 0, GL_STREAM_READ);
 			glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
+			
 
 			glinit = true;
 		}
 
 		if (wtf) {
-
+			pboindex++;
+			if (pboindex >= 3)
+				pboindex = 0;
+			
 			glBindTexture(GL_TEXTURE_2D, 0);
 			if (pboflag)
 			{
-				writePbo(texture2);
+				writePbo(pbo2);
 				pbo2yay = true;
+				cam->SetEye(pboflag);
 				if (pbo1yay)
 				{
-					pixels = readPbo(texture);
+					pixels = readPbo(pbo1);
 				}
 			}
 
 			if (!pboflag)
 			{
-				writePbo(texture);
+				writePbo(pbo1);
+				cam->SetEye(pboflag);
 				//glBufferDataARB(GL_PIXEL_PACK_BUFFER, 1280 * 720 * 4, 0, GL_STREAM_READ);
 				pbo1yay = true;
 				if (pbo2yay)
 				{
-					glBindBufferARB(GL_PIXEL_PACK_BUFFER, texture2);
-					GLubyte* src = (GLubyte*)glMapBufferARB(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB);
-					pixels = src;
+					pixels2 = readPbo(pbo2);
 				}
 				
 			}
+			
+
+			/*
+			bool pbowritten = false;
+			bool firstwritten = false;
+			if (pboindex == 0)
+			{
+				writePbo(pbo1);
+				pbo1yay = true;
+			}
+			else {
+				if (pboindex != 1)
+				if (pbo3yay)
+				{
+					pixels3 = readPbo(pbo3);
+				}
+			}
+
+			if (pboindex == 1)
+			{
+				writePbo(pbo2);
+				pbo2yay = true;
+			}
+			else {
+				if (pboindex != 2)
+				if (pbo1yay)
+					pixels = readPbo(pbo1);
+			}
+
+			if (pboindex == 2)
+			{
+				writePbo(pbo3);
+				pbo3yay = true;
+			}
+			else {
+				if (pboindex != 0)
+				if (pbo2yay)
+					pixels2 = readPbo(pbo2);
+			}
+			*/
+
 			glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
 
+			drawPbo(pixels, aX, aY, aW, aH);
+			drawPbo(pixels2, bX, bY , bW ,bH);
 			//glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, 0);
 			//glReadPixels(0, 0, 1280, 720, FORMAT, GL_UNSIGNED_BYTE, pixels);
-			glBindTexture(GL_TEXTURE_2D, 5);
+			
 			//glGetTexImage(GL_TEXTURE_2D, 0, GL_BGR, GL_UNSIGNED_BYTE, pixels);
 
 			glBindTexture(GL_TEXTURE_2D, 0);
 			
-			glBindTexture(GL_TEXTURE_2D, texture3);
-
-			/*
-			if (pboflag)
-				glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, texture);
-			else glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, texture2);
-			*/
-
-		    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1280, 720, 0, GL_BGR, GL_UNSIGNED_BYTE, pixels);
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			
-			glEnable(GL_TEXTURE_2D);
-
-			glBegin(GL_QUADS);
-			glTexCoord2i(0, 0); glVertex2i(100, 100);
-			glTexCoord2i(0, 1); glVertex2i(100, 500);
-			glTexCoord2i(1, 1); glVertex2i(500, 500);
-			glTexCoord2i(1, 0); glVertex2i(500, 100);
-			glEnd();
-			glDisable(GL_TEXTURE_2D);
-
-			glBindTexture(GL_TEXTURE_2D, 0);
-			glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
 
 			/*
 			if (pboflag && pbo1yay)
@@ -403,7 +479,16 @@ namespace DivaHook::Components
 			ImGui::InputInt("Module 2 ID", &moduleEquip2);
 			ImGui::Checkbox("recordreplay", &recordReplay);
 			ImGui::Checkbox("playreplay", &playReplay);
-			ImGui::Checkbox("wtf", &wtf);
+			ImGui::Checkbox("3dsbs", &wtf);
+			ImGui::InputInt("pboIndex", &pboindex);
+			ImGui::InputInt("1", &aX);
+			ImGui::InputInt("2", &aY);
+			ImGui::InputInt("3", &aW);
+			ImGui::InputInt("4", &aH);
+			ImGui::InputInt("5", &bX);
+			ImGui::InputInt("6", &bY);
+			ImGui::InputInt("7", &bW);
+			ImGui::InputInt("8", &bH);
 			ImGui::Text(chara);
 			if (ImGui::Button("Close")) { debugUi = false; }; ImGui::SameLine();
 			if (ImGui::Button("CloseMainUi")) { showUi = false; }; ImGui::SameLine();
@@ -675,6 +760,7 @@ namespace DivaHook::Components
 			}
 			pdm->Update();
 			frm->Update();
+			cam->Update();
 
 			if (!showUi)
 			{
@@ -734,6 +820,7 @@ namespace DivaHook::Components
 				frm->Initialize();
 				tch->Initialize();
 				inp->Initialize();
+				cam->Initialize();
 
 				*((int*)0x00F06290) = *((int*)0x0102C21C);
 				*((int*)0x00F0628C) = *((int*)0x0102C218);
@@ -806,6 +893,7 @@ namespace DivaHook::Components
 			{
 				pdm->UpdateInput();
 				frm->UpdateInput();
+				cam->UpdateInput();
 				if (!showUi && !playReplay)
 				{
 					inp->UpdateInput();
