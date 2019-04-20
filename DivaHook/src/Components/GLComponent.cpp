@@ -95,7 +95,7 @@ namespace DivaHook::Components
 	static char lastState[255];
 
 	GLubyte* pixels;
-	GLubyte* pixels2;
+	//GLubyte* pixels2;
 	static const GLenum FORMAT = GL_COMPRESSED_RGBA;
 	static const GLuint FORMAT_NBYTES = 4;
 	static bool wtf = false;
@@ -114,8 +114,8 @@ namespace DivaHook::Components
 		frm = new FrameRateManager();
 		inp = new InputEmulator();
 		tch = new TouchPanelEmulator();
-		pixels2 = new GLubyte[FORMAT_NBYTES * 1280 * 720];
-		memset(pixels2, 255, sizeof(pixels2));
+		//pixels2 = new GLubyte[FORMAT_NBYTES * 1280 * 720];
+		//memset(pixels2, 255, sizeof(pixels2));
 	}
 
 	GLComponent::~GLComponent()
@@ -125,10 +125,7 @@ namespace DivaHook::Components
 
 	void drawshit()
 	{
-		
-
 		//glBindTexture(GL_TEXTURE_2D, 0);
-
 
 		//glCopyTexImage2D(renderedTexture, 0, GL_RGB, 0, 0, 640, 720, 0);
 		//glCopyTexImage2D(renderedTexture, 0, GL_RGB, 640, 0, 640, 720, 0);
@@ -136,37 +133,49 @@ namespace DivaHook::Components
 		//glBindTexture(0, renderedTexture);
 	}
 
-	
+	PFNGLGENFRAMEBUFFERSEXTPROC glGenFramebuffersEXT;
+	PFNGLBINDFRAMEBUFFEREXTPROC glBindFramebufferEXT;
+	PFNGLFRAMEBUFFERTEXTURE2DEXTPROC glFramebufferTexture2DEXT;
+	PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC glCheckFramebufferStatusEXT;
+	PFNGLDELETEFRAMEBUFFERSEXTPROC glDeleteFramebuffersEXT;
+	PFNGLBINDBUFFERARBPROC glBindBufferARB;
+	PFNGLBUFFERDATAARBPROC glBufferDataARB;
+	PFNGLMAPBUFFERARBPROC glMapBufferARB;
+	PFNGLUNMAPBUFFERARBPROC glUnmapBufferARB;
+	PFNGLGENBUFFERSARBPROC glGenBuffersARB;
+
+	void writePbo(GLuint pbo)
+	{
+		glBindBufferARB(GL_PIXEL_PACK_BUFFER, pbo);
+		glReadBuffer(GL_BACK);
+		glReadPixels(0, 0, 1280, 720, GL_BGR, GL_UNSIGNED_BYTE, nullptr);
+		glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
+	}
+
+	GLubyte* readPbo(GLuint pbo)
+	{
+		glBindBufferARB(GL_PIXEL_PACK_BUFFER, pbo);
+		GLubyte* src = (GLubyte*)glMapBufferARB(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB);
+		glUnmapBufferARB(GL_PIXEL_PACK_BUFFER);
+		glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
+		return src;
+	}
 
 	void hwglSwapBuffers(_In_ HDC hDc)
 	{
-		//glCopyTexImage2D(0, 0, GL_RGB, 0, 0, 640, 720, 0);
-		//glCopyTexImage2D(0, 0, 
-		PFNGLGENFRAMEBUFFERSEXTPROC glGenFramebuffersEXT;
-		PFNGLBINDFRAMEBUFFEREXTPROC glBindFramebufferEXT;
-		PFNGLFRAMEBUFFERTEXTURE2DEXTPROC glFramebufferTexture2DEXT;
-		PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC glCheckFramebufferStatusEXT;
-		PFNGLDELETEFRAMEBUFFERSEXTPROC glDeleteFramebuffersEXT;
-		PFNGLBINDBUFFERARBPROC glBindBufferARB;
-		PFNGLBUFFERDATAARBPROC glBufferDataARB;
-		PFNGLMAPBUFFERARBPROC glMapBufferARB;
-		PFNGLUNMAPBUFFERARBPROC glUnmapBufferARB;
-		PFNGLGENBUFFERSARBPROC glGenBuffersARB;
-
-		glGenFramebuffersEXT = (PFNGLGENFRAMEBUFFERSEXTPROC)wglGetProcAddress("glGenFramebuffersEXT");
-		glBindFramebufferEXT = (PFNGLBINDFRAMEBUFFEREXTPROC)wglGetProcAddress("glBindFramebufferEXT");
-		glFramebufferTexture2DEXT = (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC)wglGetProcAddress("glFramebufferTexture2DEXT");
-		glCheckFramebufferStatusEXT = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)wglGetProcAddress("glCheckFramebufferStatusEXT");
-		glDeleteFramebuffersEXT = (PFNGLDELETEFRAMEBUFFERSEXTPROC)wglGetProcAddress("glDeleteFramebuffersEXT");
-		glBindBufferARB = (PFNGLBINDBUFFERARBPROC)wglGetProcAddress("glBindBufferARB");
-		glBufferDataARB = (PFNGLBUFFERDATAARBPROC)wglGetProcAddress("glBufferDataARB");
-		glMapBufferARB = (PFNGLMAPBUFFERARBPROC)wglGetProcAddress("glMapBufferARB");
-		glUnmapBufferARB = (PFNGLUNMAPBUFFERARBPROC)wglGetProcAddress("glUnmapBufferARB");
-		glGenBuffersARB = (PFNGLGENBUFFERSARBPROC)wglGetProcAddress("glGenBuffersARB");
-		//GLuint ourfb = 5;
-		
 		if (!glinit)
 		{
+			glGenFramebuffersEXT = (PFNGLGENFRAMEBUFFERSEXTPROC)wglGetProcAddress("glGenFramebuffersEXT");
+			glBindFramebufferEXT = (PFNGLBINDFRAMEBUFFEREXTPROC)wglGetProcAddress("glBindFramebufferEXT");
+			glFramebufferTexture2DEXT = (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC)wglGetProcAddress("glFramebufferTexture2DEXT");
+			glCheckFramebufferStatusEXT = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)wglGetProcAddress("glCheckFramebufferStatusEXT");
+			glDeleteFramebuffersEXT = (PFNGLDELETEFRAMEBUFFERSEXTPROC)wglGetProcAddress("glDeleteFramebuffersEXT");
+			glBindBufferARB = (PFNGLBINDBUFFERARBPROC)wglGetProcAddress("glBindBufferARB");
+			glBufferDataARB = (PFNGLBUFFERDATAARBPROC)wglGetProcAddress("glBufferDataARB");
+			glMapBufferARB = (PFNGLMAPBUFFERARBPROC)wglGetProcAddress("glMapBufferARB");
+			glUnmapBufferARB = (PFNGLUNMAPBUFFERARBPROC)wglGetProcAddress("glUnmapBufferARB");
+			glGenBuffersARB = (PFNGLGENBUFFERSARBPROC)wglGetProcAddress("glGenBuffersARB");
+
 			glGetIntegerv(GL_DEPTH_BITS, &depth);
 			glGenBuffersARB(1, &texture);
 			glGenBuffersARB(1, &texture2);
@@ -179,33 +188,22 @@ namespace DivaHook::Components
 			glinit = true;
 		}
 
-		//glBindTexture(GL_TEXTURE_2D, 5);
 		if (wtf) {
 
 			glBindTexture(GL_TEXTURE_2D, 0);
 			if (pboflag)
 			{
-				glBindBufferARB(GL_PIXEL_PACK_BUFFER, texture2);
-				glReadBuffer(GL_BACK);
-				glReadPixels(0, 0, 1280, 720, GL_BGR, GL_UNSIGNED_BYTE, nullptr);
-				//glBufferDataARB(GL_PIXEL_PACK_BUFFER, 1280 * 720 * 4, 0, GL_STREAM_READ);
+				writePbo(texture2);
 				pbo2yay = true;
 				if (pbo1yay)
 				{
-					glBindBufferARB(GL_PIXEL_PACK_BUFFER, texture);
-					GLubyte* src = (GLubyte*)glMapBufferARB(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB);
-					pixels = src;
-					glUnmapBufferARB(GL_PIXEL_PACK_BUFFER);
-					//std::copy(
-					//memcpy_s(pixels2, sizeof(pixels2), pixels, 1280 * 720 * 4);
+					pixels = readPbo(texture);
 				}
 			}
 
 			if (!pboflag)
 			{
-				glBindBufferARB(GL_PIXEL_PACK_BUFFER, texture);
-				glReadBuffer(GL_BACK);
-				glReadPixels(0, 0, 1280, 720, GL_BGR, GL_UNSIGNED_BYTE, nullptr);
+				writePbo(texture);
 				//glBufferDataARB(GL_PIXEL_PACK_BUFFER, 1280 * 720 * 4, 0, GL_STREAM_READ);
 				pbo1yay = true;
 				if (pbo2yay)
@@ -213,7 +211,6 @@ namespace DivaHook::Components
 					glBindBufferARB(GL_PIXEL_PACK_BUFFER, texture2);
 					GLubyte* src = (GLubyte*)glMapBufferARB(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB);
 					pixels = src;
-					glUnmapBufferARB(GL_PIXEL_PACK_BUFFER);
 				}
 				
 			}
