@@ -105,13 +105,7 @@
     <ClInclude Include="src\Components\FastLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\deps\imgui\GL\gl3w.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Components\GLComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\deps\imgui\GL\glcorearb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Components\GLMemory.h">
@@ -214,6 +208,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Input\DirectInput\Controller.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\GL\glcorearb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\GL\gl3w.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\GL\glext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\KHR\khrplatform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

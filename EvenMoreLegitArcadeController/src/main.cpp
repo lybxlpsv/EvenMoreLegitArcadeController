@@ -168,8 +168,9 @@ int main(int argc, char** argv)
 
 		ResumeThread(thread);
 
-		CloseHandle(thread);
-		CloseHandle(process);
+		//CloseHandle(thread);
+		//CloseHandle(process);
+		std::cin.get();
 	}
 	else {
 		printf("main(): Exiting ");

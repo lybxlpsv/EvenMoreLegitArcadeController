@@ -29,6 +29,7 @@
 #include "imgui/imgui_impl_opengl2.h"
 #include "imgui/imgui_impl_win32.h"
 #include "GL/gl.h"
+#include "GL/glext.h"
 
 #include "base64/base64.h"
 
@@ -45,7 +46,7 @@ namespace DivaHook::Components
 	static bool showFps = false;
 	static bool showUi2 = false;
 	static bool showAbout = false;
-	static int firstTime = 10000;
+	static int firstTime = 1000;
 	static int fpsLimit = 0;
 	static int fpsLimitSet = 0;
 	static int sfxVolume = 100;
@@ -86,12 +87,26 @@ namespace DivaHook::Components
 	static bool playReplay = false;
 	static bool playReplay2 = false;
 
-	static int timeBeforeInit = 10000;
+	static int timeBeforeInit = 5000;
 	static bool initialized = false;
 
 	char chara[0x212U] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
 
 	static char lastState[255];
+
+	GLubyte* pixels;
+	GLubyte* pixels2;
+	static const GLenum FORMAT = GL_COMPRESSED_RGBA;
+	static const GLuint FORMAT_NBYTES = 4;
+	static bool wtf = false;
+	static bool glinit = false;
+	GLuint texture = 400000000;
+	GLuint texture2 = 400000001;
+	GLuint texture3 = 400000002;
+	bool pboflag = false;
+	bool pbo1yay = false;
+	bool pbo2yay = false;
+	GLint depth;
 
 	GLComponent::GLComponent()
 	{
@@ -99,6 +114,8 @@ namespace DivaHook::Components
 		frm = new FrameRateManager();
 		inp = new InputEmulator();
 		tch = new TouchPanelEmulator();
+		pixels2 = new GLubyte[FORMAT_NBYTES * 1280 * 720];
+		memset(pixels2, 255, sizeof(pixels2));
 	}
 
 	GLComponent::~GLComponent()
@@ -106,15 +123,170 @@ namespace DivaHook::Components
 
 	}
 
+	void drawshit()
+	{
+		
+
+		//glBindTexture(GL_TEXTURE_2D, 0);
+
+
+		//glCopyTexImage2D(renderedTexture, 0, GL_RGB, 0, 0, 640, 720, 0);
+		//glCopyTexImage2D(renderedTexture, 0, GL_RGB, 640, 0, 640, 720, 0);
+
+		//glBindTexture(0, renderedTexture);
+	}
+
+	
+
 	void hwglSwapBuffers(_In_ HDC hDc)
 	{
+		//glCopyTexImage2D(0, 0, GL_RGB, 0, 0, 640, 720, 0);
+		//glCopyTexImage2D(0, 0, 
+		PFNGLGENFRAMEBUFFERSEXTPROC glGenFramebuffersEXT;
+		PFNGLBINDFRAMEBUFFEREXTPROC glBindFramebufferEXT;
+		PFNGLFRAMEBUFFERTEXTURE2DEXTPROC glFramebufferTexture2DEXT;
+		PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC glCheckFramebufferStatusEXT;
+		PFNGLDELETEFRAMEBUFFERSEXTPROC glDeleteFramebuffersEXT;
+		PFNGLBINDBUFFERARBPROC glBindBufferARB;
+		PFNGLBUFFERDATAARBPROC glBufferDataARB;
+		PFNGLMAPBUFFERARBPROC glMapBufferARB;
+		PFNGLUNMAPBUFFERARBPROC glUnmapBufferARB;
+		PFNGLGENBUFFERSARBPROC glGenBuffersARB;
+
+		glGenFramebuffersEXT = (PFNGLGENFRAMEBUFFERSEXTPROC)wglGetProcAddress("glGenFramebuffersEXT");
+		glBindFramebufferEXT = (PFNGLBINDFRAMEBUFFEREXTPROC)wglGetProcAddress("glBindFramebufferEXT");
+		glFramebufferTexture2DEXT = (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC)wglGetProcAddress("glFramebufferTexture2DEXT");
+		glCheckFramebufferStatusEXT = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)wglGetProcAddress("glCheckFramebufferStatusEXT");
+		glDeleteFramebuffersEXT = (PFNGLDELETEFRAMEBUFFERSEXTPROC)wglGetProcAddress("glDeleteFramebuffersEXT");
+		glBindBufferARB = (PFNGLBINDBUFFERARBPROC)wglGetProcAddress("glBindBufferARB");
+		glBufferDataARB = (PFNGLBUFFERDATAARBPROC)wglGetProcAddress("glBufferDataARB");
+		glMapBufferARB = (PFNGLMAPBUFFERARBPROC)wglGetProcAddress("glMapBufferARB");
+		glUnmapBufferARB = (PFNGLUNMAPBUFFERARBPROC)wglGetProcAddress("glUnmapBufferARB");
+		glGenBuffersARB = (PFNGLGENBUFFERSARBPROC)wglGetProcAddress("glGenBuffersARB");
+		//GLuint ourfb = 5;
+		
+		if (!glinit)
+		{
+			glGetIntegerv(GL_DEPTH_BITS, &depth);
+			glGenBuffersARB(1, &texture);
+			glGenBuffersARB(1, &texture2);
+			glBindBufferARB(GL_PIXEL_PACK_BUFFER, texture);
+			glBufferDataARB(GL_PIXEL_PACK_BUFFER, 1280 * 720 * 4, 0, GL_STREAM_READ);
+			glBindBufferARB(GL_PIXEL_PACK_BUFFER, texture2);
+			glBufferDataARB(GL_PIXEL_PACK_BUFFER, 1280 * 720 * 4, 0, GL_STREAM_READ);
+			glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
+
+			glinit = true;
+		}
+
+		//glBindTexture(GL_TEXTURE_2D, 5);
+		if (wtf) {
+
+			glBindTexture(GL_TEXTURE_2D, 0);
+			if (pboflag)
+			{
+				glBindBufferARB(GL_PIXEL_PACK_BUFFER, texture2);
+				glReadBuffer(GL_BACK);
+				glReadPixels(0, 0, 1280, 720, GL_BGR, GL_UNSIGNED_BYTE, nullptr);
+				//glBufferDataARB(GL_PIXEL_PACK_BUFFER, 1280 * 720 * 4, 0, GL_STREAM_READ);
+				pbo2yay = true;
+				if (pbo1yay)
+				{
+					glBindBufferARB(GL_PIXEL_PACK_BUFFER, texture);
+					GLubyte* src = (GLubyte*)glMapBufferARB(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB);
+					pixels = src;
+					glUnmapBufferARB(GL_PIXEL_PACK_BUFFER);
+					//std::copy(
+					//memcpy_s(pixels2, sizeof(pixels2), pixels, 1280 * 720 * 4);
+				}
+			}
+
+			if (!pboflag)
+			{
+				glBindBufferARB(GL_PIXEL_PACK_BUFFER, texture);
+				glReadBuffer(GL_BACK);
+				glReadPixels(0, 0, 1280, 720, GL_BGR, GL_UNSIGNED_BYTE, nullptr);
+				//glBufferDataARB(GL_PIXEL_PACK_BUFFER, 1280 * 720 * 4, 0, GL_STREAM_READ);
+				pbo1yay = true;
+				if (pbo2yay)
+				{
+					glBindBufferARB(GL_PIXEL_PACK_BUFFER, texture2);
+					GLubyte* src = (GLubyte*)glMapBufferARB(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB);
+					pixels = src;
+					glUnmapBufferARB(GL_PIXEL_PACK_BUFFER);
+				}
+				
+			}
+			glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
+
+			//glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, 0);
+			//glReadPixels(0, 0, 1280, 720, FORMAT, GL_UNSIGNED_BYTE, pixels);
+			glBindTexture(GL_TEXTURE_2D, 5);
+			//glGetTexImage(GL_TEXTURE_2D, 0, GL_BGR, GL_UNSIGNED_BYTE, pixels);
+
+			glBindTexture(GL_TEXTURE_2D, 0);
+			
+			glBindTexture(GL_TEXTURE_2D, texture3);
+
+			/*
+			if (pboflag)
+				glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, texture);
+			else glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, texture2);
+			*/
+
+		    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1280, 720, 0, GL_BGR, GL_UNSIGNED_BYTE, pixels);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			
+			glEnable(GL_TEXTURE_2D);
+
+			glBegin(GL_QUADS);
+			glTexCoord2i(0, 0); glVertex2i(100, 100);
+			glTexCoord2i(0, 1); glVertex2i(100, 500);
+			glTexCoord2i(1, 1); glVertex2i(500, 500);
+			glTexCoord2i(1, 0); glVertex2i(500, 100);
+			glEnd();
+			glDisable(GL_TEXTURE_2D);
+
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
+
+			/*
+			if (pboflag && pbo1yay)
+			{
+				glBindBufferARB(GL_PIXEL_PACK_BUFFER, texture);
+				pixels = nullptr;
+				glUnmapBufferARB(GL_PIXEL_PACK_BUFFER);
+			}
+
+			if ((!pboflag) && pbo2yay)
+			{
+				glBindBufferARB(GL_PIXEL_PACK_BUFFER, texture2);
+				pixels = nullptr;
+			}
+			*/
+
+			glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
+
+			if (pboflag)
+				pboflag = false;
+			else pboflag = true;
+		}
+
+		//glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 5, 0);
+		//glReadBuffer(GL_FRONT_AND_BACK);
+		
+
 		ImGuiIO& io = ImGui::GetIO();
 		auto keyboard = DivaHook::Input::Keyboard::GetInstance();
 		auto xinput = DivaHook::Input::Xinput::GetInstance();
 		io.MouseDown[0] = keyboard->IsDown(VK_LBUTTON);
 		io.MouseDown[1] = keyboard->IsDown(VK_RBUTTON);
 		io.MouseDown[2] = keyboard->IsDown(VK_MBUTTON);
-
+		
 		io.KeysDown[ImGuiKey_Enter] = keyboard->IsDown(VK_RETURN);
 		io.KeysDown[ImGuiKey_Backspace] = keyboard->IsDown(VK_BACK);
 
@@ -234,6 +406,7 @@ namespace DivaHook::Components
 			ImGui::InputInt("Module 2 ID", &moduleEquip2);
 			ImGui::Checkbox("recordreplay", &recordReplay);
 			ImGui::Checkbox("playreplay", &playReplay);
+			ImGui::Checkbox("wtf", &wtf);
 			ImGui::Text(chara);
 			if (ImGui::Button("Close")) { debugUi = false; }; ImGui::SameLine();
 			if (ImGui::Button("CloseMainUi")) { showUi = false; }; ImGui::SameLine();
