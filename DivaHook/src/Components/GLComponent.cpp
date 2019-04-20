@@ -102,11 +102,14 @@ namespace DivaHook::Components
 	static const GLenum FORMAT = GL_COMPRESSED_RGBA;
 	static const GLuint FORMAT_NBYTES = 4;
 	static bool wtf = false;
+	static bool copydepth = false;
 	static bool glinit = false;
 	GLuint pbo1 = 400000000;
 	GLuint pbo2 = 400000001;
 	GLuint pbo3 = 400000003;
 	GLuint texture3 = 400000002;
+	GLuint texture4 = 400000004;
+	GLuint texture5 = 400000005;
 	bool pboflag = false;
 	bool pbo1yay = false;
 	bool pbo2yay = false;
@@ -159,6 +162,7 @@ namespace DivaHook::Components
 	PFNGLMAPBUFFERARBPROC glMapBufferARB;
 	PFNGLUNMAPBUFFERARBPROC glUnmapBufferARB;
 	PFNGLGENBUFFERSARBPROC glGenBuffersARB;
+	PFNGLBLITFRAMEBUFFEREXTPROC glBlitFramebufferEXT;
 
 	void drawPbo(GLubyte* pixels, GLint x, GLint y, GLint w, GLint h)
 	{
@@ -223,6 +227,7 @@ namespace DivaHook::Components
 			glMapBufferARB = (PFNGLMAPBUFFERARBPROC)wglGetProcAddress("glMapBufferARB");
 			glUnmapBufferARB = (PFNGLUNMAPBUFFERARBPROC)wglGetProcAddress("glUnmapBufferARB");
 			glGenBuffersARB = (PFNGLGENBUFFERSARBPROC)wglGetProcAddress("glGenBuffersARB");
+			glBlitFramebufferEXT = (PFNGLBLITFRAMEBUFFEREXTPROC)wglGetProcAddress("glBlitFramebufferEXT");
 
 			glGetIntegerv(GL_DEPTH_BITS, &depth);
 			//pboInit(pbo1);
@@ -244,12 +249,21 @@ namespace DivaHook::Components
 			glinit = true;
 		}
 
+		if (copydepth)
+		{
+			glBindFramebufferEXT(GL_READ_FRAMEBUFFER, 3);
+			glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER, 0);
+			glBlitFramebufferEXT(0, 0, 2560, 1440, 0, 0, 1280, 720,
+				GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+		}
+
 		if (wtf) {
 			pboindex++;
 			if (pboindex >= 3)
 				pboindex = 0;
 			
 			glBindTexture(GL_TEXTURE_2D, 0);
+
 			if (pboflag)
 			{
 				writePbo(pbo2);
@@ -324,8 +338,6 @@ namespace DivaHook::Components
 
 			glBindTexture(GL_TEXTURE_2D, 0);
 			
-			
-
 			/*
 			if (pboflag && pbo1yay)
 			{
@@ -479,6 +491,7 @@ namespace DivaHook::Components
 			ImGui::Checkbox("recordreplay", &recordReplay);
 			ImGui::Checkbox("playreplay", &playReplay);
 			ImGui::Checkbox("3dsbs", &wtf);
+			ImGui::Checkbox("depthcopy", &copydepth);
 			ImGui::InputInt("pboIndex", &pboindex);
 			ImGui::InputInt("1", &aX);
 			ImGui::InputInt("2", &aY);
