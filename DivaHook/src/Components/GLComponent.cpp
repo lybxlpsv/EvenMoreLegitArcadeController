@@ -215,6 +215,9 @@ namespace DivaHook::Components
 
 	void hwglSwapBuffers(_In_ HDC hDc)
 	{
+		int* fbWidth = (int*)FB_RESOLUTION_WIDTH_ADDRESS;
+		int* fbHeight = (int*)FB_RESOLUTION_HEIGHT_ADDRESS;
+
 		if (!glinit)
 		{
 			glGenFramebuffersEXT = (PFNGLGENFRAMEBUFFERSEXTPROC)wglGetProcAddress("glGenFramebuffersEXT");
@@ -251,9 +254,14 @@ namespace DivaHook::Components
 
 		if (copydepth)
 		{
+			RECT hWindow;
+			GetClientRect(DivaHook::MainModule::DivaWindowHandle, &hWindow);
+			long uiWidth = hWindow.right - hWindow.left;
+			long uiHeight = hWindow.bottom - hWindow.top;
+
 			glBindFramebufferEXT(GL_READ_FRAMEBUFFER, 3);
 			glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER, 0);
-			glBlitFramebufferEXT(0, 0, 2560, 1440, 0, 0, 1280, 720,
+			glBlitFramebufferEXT(0, 0, *fbWidth, *fbHeight, 0, 0, uiWidth, uiHeight,
 				GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 		}
 
@@ -374,8 +382,7 @@ namespace DivaHook::Components
 		io.KeysDown[ImGuiKey_Enter] = keyboard->IsDown(VK_RETURN);
 		io.KeysDown[ImGuiKey_Backspace] = keyboard->IsDown(VK_BACK);
 
-		int* fbWidth = (int*)FB_RESOLUTION_WIDTH_ADDRESS;
-		int* fbHeight = (int*)FB_RESOLUTION_HEIGHT_ADDRESS;
+		
 
 		if (*fbWidth > maxRenderWidth) *fbWidth = maxRenderWidth;
 		if (*fbHeight > maxRenderHeight) *fbHeight = maxRenderHeight;
