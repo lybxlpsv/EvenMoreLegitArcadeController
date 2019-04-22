@@ -98,7 +98,7 @@ namespace DivaHook::Components
 
 	void CameraController::UpdateInput()
 	{
-		if (!eyeOverride)
+		if (!eyeOverride2 || !camOverride)
 		{
 			if (ToggleBinding->AnyTapped())
 			{
@@ -178,15 +178,42 @@ namespace DivaHook::Components
 		{
 			eyeOverride = true;
 			SetIsEnabled(eye);
+
 			for (int i = 0; i < sizeof(cameraSetterAddresses) / sizeof(void*); i++)
 				*(uint8_t*)cameraSetterAddresses[i] = RET_OPCODE;
-			camera->Position.X = camera->Position.X - 0.05;
-			camera->Focus.X = camera->Focus.X - 0.05;
+
+			camera->Position.X = camera->Position.X - sbs3dxoffset;
+			camera->Focus.X = camera->Focus.X - sbs3dxoffset2;
 
 		}
 		else {
 			eyeOverride = false;
 			SetIsEnabled(eye);
+			if (!camOverride)
+			for (int i = 0; i < sizeof(cameraSetterAddresses) / sizeof(void*); i++)
+				*(uint8_t*)cameraSetterAddresses[i] = originalSetterBytes[i];
+			else {
+				*(uint8_t*)cameraSetterAddresses[0] = originalSetterBytes[0];
+				*(uint8_t*)cameraSetterAddresses[1] = originalSetterBytes[1];
+			}
+		}
+	}
+
+	void CameraController::EnforceValue(bool value)
+	{
+		if (value)
+		{
+			*(uint8_t*)cameraSetterAddresses[3] = RET_OPCODE;
+			*(uint8_t*)cameraSetterAddresses[2] = RET_OPCODE;
+
+			horizontalRotation = horiz;
+			camera->Rotation = rot;
+			camera->HorizontalFov = hfov;
+			camera->VerticalFov = vfov;
+		}
+		else
+		{
+			// restore camera setters
 			for (int i = 0; i < sizeof(cameraSetterAddresses) / sizeof(void*); i++)
 				*(uint8_t*)cameraSetterAddresses[i] = originalSetterBytes[i];
 		}
@@ -211,16 +238,22 @@ namespace DivaHook::Components
 		{
 			// disable camera setters
 			//for (int i = 0; i < sizeof(cameraSetterAddresses) / sizeof(void*); i++)
-				*(uint8_t*)cameraSetterAddresses[1] = RET_OPCODE;
+				*(uint8_t*)cameraSetterAddresses[3] = RET_OPCODE;
+				*(uint8_t*)cameraSetterAddresses[2] = RET_OPCODE;
+				//0 cam pos
+				//1 rotation
+				//2 rotation qe
+				//3 x y
 
 			// set initial camera angle
 			//Vec2 camXz = Vec2(camera->Position.X, camera->Position.Z);
 			//Vec2 focusXz = Vec2(camera->Focus.X, camera->Focus.Z);
 			//verticalRotation = AngleFromPoints(camXz, focusXz);
 
-			//horizontalRotation = 0;
-			//camera->Rotation = defaultRotation;
-			//camera->HorizontalFov = defaultFov;
+			horizontalRotation = 0;
+			camera->Rotation = defaultRotation;
+			camera->HorizontalFov = 65.0f;
+			camera->VerticalFov = 50.0f;
 		}
 		else
 		{

@@ -31,6 +31,10 @@ namespace DivaHook::Components
 		~CameraController();
 
 		bool eyeOverride = false;
+		bool camOverride = false;
+		bool eyeOverride2 = false;
+
+		int overridetest = 3;
 
 		virtual const char* GetDisplayName() override;
 
@@ -40,6 +44,16 @@ namespace DivaHook::Components
 		virtual void SetEye(bool eye);
 
 		void SetControls(bool value);
+
+		void EnforceValue(bool value);
+
+		float hfov = 65.0f;
+		float vfov = 50.0f;
+		float rot = 0.0f;
+		float horiz = 0;
+
+		float sbs3dxoffset = 0.05f;
+		float sbs3dxoffset2 = 0.05f;
 
 		bool GetIsEnabled();
 

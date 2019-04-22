@@ -77,6 +77,7 @@ namespace DivaHook::Components
 	static bool resetGame = false;
 	static bool resetGameUi = false;
 	static bool debugUi = false;
+	static bool cameraUi = false;
 
 	static int module1[1000];
 	static int module2[1000];
@@ -125,6 +126,8 @@ namespace DivaHook::Components
 	int aW = 640; int aH = 720;
 	int bX = 640; int bY = 0;
 	int bW = 640; int bH = 720;
+
+	bool framesq = false;
 
 	GLComponent::GLComponent()
 	{
@@ -215,6 +218,10 @@ namespace DivaHook::Components
 
 	void hwglSwapBuffers(_In_ HDC hDc)
 	{
+		if (cam->camOverride)
+			cam->EnforceValue(true);
+		else cam->EnforceValue(false);
+
 		int* fbWidth = (int*)FB_RESOLUTION_WIDTH_ADDRESS;
 		int* fbHeight = (int*)FB_RESOLUTION_HEIGHT_ADDRESS;
 
@@ -264,11 +271,12 @@ namespace DivaHook::Components
 			glBlitFramebufferEXT(0, 0, *fbWidth, *fbHeight, 0, 0, uiWidth, uiHeight,
 				GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 		}
-
-		if (wtf) {
-			pboindex++;
-			if (pboindex >= 3)
-				pboindex = 0;
+		
+		cam->eyeOverride2 = wtf;
+		if (wtf && !framesq) {
+			//pboindex++;
+			//if (pboindex >= 3)
+			//	pboindex = 0;
 			
 			glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -368,6 +376,13 @@ namespace DivaHook::Components
 			else pboflag = true;
 		}
 
+		if (wtf && framesq) {
+			cam->SetEye(pboflag);
+
+			if (pboflag)
+				pboflag = false;
+			else pboflag = true;
+		}
 		//glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 5, 0);
 		//glReadBuffer(GL_FRONT_AND_BACK);
 		
@@ -500,6 +515,7 @@ namespace DivaHook::Components
 			ImGui::Checkbox("3dsbs", &wtf);
 			ImGui::Checkbox("depthcopy", &copydepth);
 			ImGui::InputInt("pboIndex", &pboindex);
+			ImGui::Checkbox("camOverride", &cam->camOverride);
 			ImGui::InputInt("1", &aX);
 			ImGui::InputInt("2", &aY);
 			ImGui::InputInt("3", &aW);
@@ -509,6 +525,29 @@ namespace DivaHook::Components
 			ImGui::InputInt("7", &bW);
 			ImGui::InputInt("8", &bH);
 			ImGui::Text(chara);
+			if (ImGui::Button("Close")) { debugUi = false; }; ImGui::SameLine();
+			if (ImGui::Button("CloseMainUi")) { showUi = false; }; ImGui::SameLine();
+			ImGui::End();
+		}
+
+		if (cameraUi)
+		{
+			ImGuiWindowFlags window_flags = 0;
+			window_flags |= ImGuiWindowFlags_NoResize;
+			window_flags |= ImGuiWindowFlags_NoCollapse;
+			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+			io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+			ImGui::Begin("Camera UI", &cameraUi, window_flags);
+			ImGui::InputFloat("H Rotation", &cam->horiz);
+			ImGui::InputFloat("Rotation", &cam->rot);
+			ImGui::InputFloat("H FOV", &cam->hfov);
+			ImGui::InputFloat("V FOV", &cam->vfov);
+			ImGui::Checkbox("Turn On", &cam->camOverride);
+			ImGui::InputFloat("Left Eye Offset 1", &cam->sbs3dxoffset);
+			ImGui::InputFloat("Left Eye Offset 2", &cam->sbs3dxoffset2);
+			ImGui::Checkbox("SBS 3D", &wtf);
+			ImGui::Checkbox("Frame-Sequential", &framesq);
 			if (ImGui::Button("Close")) { debugUi = false; }; ImGui::SameLine();
 			if (ImGui::Button("CloseMainUi")) { showUi = false; }; ImGui::SameLine();
 			ImGui::End();
@@ -563,6 +602,7 @@ namespace DivaHook::Components
 			if (ImGui::Button("Close")) { showUi = false; }; ImGui::SameLine();
 			if (ImGui::Button("Reset")) { resetGameUi = true; }; ImGui::SameLine();
 			if (ImGui::Button("About")) { showAbout = true; } ImGui::SameLine();
+			if (ImGui::Button("Camera")) { cameraUi = true; } ImGui::SameLine();
 			if (ImGui::Button("Debug")) { debugUi = true; } ImGui::SameLine();
 			ImGui::End();
 		}
