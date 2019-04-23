@@ -29,8 +29,8 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_opengl2.h"
 #include "imgui/imgui_impl_win32.h"
+#include "GL/glew.h"
 #include "GL/gl.h"
-#include "GL/glext.h"
 
 #include "base64/base64.h"
 
@@ -145,6 +145,81 @@ namespace DivaHook::Components
 
 	}
 
+	std::string readFile(const char *filePath) {
+		std::string content;
+		std::ifstream fileStream(filePath, std::ios::in);
+
+		if (!fileStream.is_open()) {
+			std::cerr << "Could not read file " << filePath << ". File does not exist." << std::endl;
+			return "";
+		}
+
+		std::string line = "";
+		while (!fileStream.eof()) {
+			std::getline(fileStream, line);
+			content.append(line + "\n");
+		}
+
+		fileStream.close();
+		return content;
+	}
+
+
+	GLuint LoadShader(const char *vertex_path, const char *fragment_path) {
+		GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
+		GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+		// Read shaders
+		std::string vertShaderStr = readFile(vertex_path);
+		std::string fragShaderStr = readFile(fragment_path);
+		const char *vertShaderSrc = vertShaderStr.c_str();
+		const char *fragShaderSrc = fragShaderStr.c_str();
+
+		GLint result = GL_FALSE;
+		int logLength;
+
+		// Compile vertex shader
+		std::cout << "Compiling vertex shader." << std::endl;
+		glShaderSource(vertShader, 1, &vertShaderSrc, NULL);
+		glCompileShader(vertShader);
+
+		// Check vertex shader
+		glGetShaderiv(vertShader, GL_COMPILE_STATUS, &result);
+		glGetShaderiv(vertShader, GL_INFO_LOG_LENGTH, &logLength);
+		//std::vector vertShaderError((logLength > 1) ? logLength : 1);
+		//glGetShaderInfoLog(vertShader, logLength, NULL, &vertShaderError[0]);
+		//std::cout << &vertShaderError[0] << std::endl;
+
+		// Compile fragment shader
+		std::cout << "Compiling fragment shader." << std::endl;
+		glShaderSource(fragShader, 1, &fragShaderSrc, NULL);
+		glCompileShader(fragShader);
+
+		// Check fragment shader
+		glGetShaderiv(fragShader, GL_COMPILE_STATUS, &result);
+		glGetShaderiv(fragShader, GL_INFO_LOG_LENGTH, &logLength);
+		//std::vector fragShaderError((logLength > 1) ? logLength : 1);
+		//glGetShaderInfoLog(fragShader, logLength, NULL, &fragShaderError[0]);
+		//std::cout << &fragShaderError[0] << std::endl;
+
+		std::cout << "Linking program" << std::endl;
+		GLuint program = glCreateProgram();
+		glAttachShader(program, vertShader);
+		glAttachShader(program, fragShader);
+		glLinkProgram(program);
+
+		glGetProgramiv(program, GL_LINK_STATUS, &result);
+		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
+		std::vector<char> programError((logLength > 1) ? logLength : 1);
+		glGetProgramInfoLog(program, logLength, NULL, &programError[0]);
+		std::cout << &programError[0] << std::endl;
+
+		glDeleteShader(vertShader);
+		glDeleteShader(fragShader);
+
+		return program;
+	}
+
 	void drawshit()
 	{
 		//glBindTexture(GL_TEXTURE_2D, 0);
@@ -154,18 +229,6 @@ namespace DivaHook::Components
 
 		//glBindTexture(0, renderedTexture);
 	}
-
-	PFNGLGENFRAMEBUFFERSEXTPROC glGenFramebuffersEXT;
-	PFNGLBINDFRAMEBUFFEREXTPROC glBindFramebufferEXT;
-	PFNGLFRAMEBUFFERTEXTURE2DEXTPROC glFramebufferTexture2DEXT;
-	PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC glCheckFramebufferStatusEXT;
-	PFNGLDELETEFRAMEBUFFERSEXTPROC glDeleteFramebuffersEXT;
-	PFNGLBINDBUFFERARBPROC glBindBufferARB;
-	PFNGLBUFFERDATAARBPROC glBufferDataARB;
-	PFNGLMAPBUFFERARBPROC glMapBufferARB;
-	PFNGLUNMAPBUFFERARBPROC glUnmapBufferARB;
-	PFNGLGENBUFFERSARBPROC glGenBuffersARB;
-	PFNGLBLITFRAMEBUFFEREXTPROC glBlitFramebufferEXT;
 
 	void drawPbo(GLubyte* pixels, GLint x, GLint y, GLint w, GLint h)
 	{
@@ -216,6 +279,8 @@ namespace DivaHook::Components
 		glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
 	}
 
+	GLuint dof_shader;
+
 	void hwglSwapBuffers(_In_ HDC hDc)
 	{
 		if (cam->camOverride)
@@ -227,23 +292,13 @@ namespace DivaHook::Components
 
 		if (!glinit)
 		{
-			glGenFramebuffersEXT = (PFNGLGENFRAMEBUFFERSEXTPROC)wglGetProcAddress("glGenFramebuffersEXT");
-			glBindFramebufferEXT = (PFNGLBINDFRAMEBUFFEREXTPROC)wglGetProcAddress("glBindFramebufferEXT");
-			glFramebufferTexture2DEXT = (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC)wglGetProcAddress("glFramebufferTexture2DEXT");
-			glCheckFramebufferStatusEXT = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)wglGetProcAddress("glCheckFramebufferStatusEXT");
-			glDeleteFramebuffersEXT = (PFNGLDELETEFRAMEBUFFERSEXTPROC)wglGetProcAddress("glDeleteFramebuffersEXT");
-			glBindBufferARB = (PFNGLBINDBUFFERARBPROC)wglGetProcAddress("glBindBufferARB");
-			glBufferDataARB = (PFNGLBUFFERDATAARBPROC)wglGetProcAddress("glBufferDataARB");
-			glMapBufferARB = (PFNGLMAPBUFFERARBPROC)wglGetProcAddress("glMapBufferARB");
-			glUnmapBufferARB = (PFNGLUNMAPBUFFERARBPROC)wglGetProcAddress("glUnmapBufferARB");
-			glGenBuffersARB = (PFNGLGENBUFFERSARBPROC)wglGetProcAddress("glGenBuffersARB");
-			glBlitFramebufferEXT = (PFNGLBLITFRAMEBUFFEREXTPROC)wglGetProcAddress("glBlitFramebufferEXT");
-
 			glGetIntegerv(GL_DEPTH_BITS, &depth);
 			//pboInit(pbo1);
 			//pboInit(pbo2);
 			//pboInit(pbo3);
 			
+			//dof_shader = LoadShader("shaders/dof_vert.txt", "shaders/dof_frag.txt");
+
 			glGenBuffersARB(1, &pbo1);
 			glGenBuffersARB(1, &pbo2);
 			glGenBuffersARB(1, &pbo3);
@@ -270,6 +325,46 @@ namespace DivaHook::Components
 			glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER, 0);
 			glBlitFramebufferEXT(0, 0, *fbWidth, *fbHeight, 0, 0, uiWidth, uiHeight,
 				GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+			/*
+
+			glBindTexture(GL_TEXTURE_2D, 5);
+
+			GLfloat adsk_result_w = glGetUniformLocation(dof_shader, "Scale");
+			GLfloat adsk_result_h = glGetUniformLocation(dof_shader, "Scale");
+
+			GLint samples = glGetUniformLocation(dof_shader, "samples");
+			GLint rings = glGetUniformLocation(dof_shader, "rings");
+			GLboolean autofocus = glGetUniformLocation(dof_shader, "autofocus");
+			GLfloat maxblur = glGetUniformLocation(dof_shader, "maxblur");
+			GLfloat threshold = glGetUniformLocation(dof_shader, "threshold");
+			GLfloat gain = glGetUniformLocation(dof_shader, "gain");
+			GLfloat bias = glGetUniformLocation(dof_shader, "bias");
+			GLfloat fringe = glGetUniformLocation(dof_shader, "fringe");
+			GLboolean noise = glGetUniformLocation(dof_shader, "noise");
+			GLfloat namount = glGetUniformLocation(dof_shader, "namount");
+			GLboolean depthblur = glGetUniformLocation(dof_shader, "depthblur");
+			GLfloat dbsize = glGetUniformLocation(dof_shader, "dbsize");
+			GLboolean pentagon = glGetUniformLocation(dof_shader, "pentagon");
+			GLfloat feather = glGetUniformLocation(dof_shader, "feather");
+
+			GLfloat aspect = glGetUniformLocation(dof_shader, "aspect");
+			GLfloat exp_noise = glGetUniformLocation(dof_shader, "exp_noise");
+
+			bias = 0.5;
+			fringe = 0.7f;
+			noise = true;
+			namount = 0.0001f;
+			dbsize = 1.250f;
+			feather = false;
+			aspect = 16.0f / 7.0f;
+			exp_noise = 1.0f;
+
+			glBindTexture(GL_TEXTURE_2D, 0);
+
+			*/
+
+			
 		}
 		
 		cam->eyeOverride2 = wtf;
@@ -548,7 +643,7 @@ namespace DivaHook::Components
 			ImGui::InputFloat("Left Eye Offset 2", &cam->sbs3dxoffset2);
 			ImGui::Checkbox("SBS 3D", &wtf);
 			ImGui::Checkbox("Frame-Sequential", &framesq);
-			if (ImGui::Button("Close")) { debugUi = false; }; ImGui::SameLine();
+			if (ImGui::Button("Close")) { cameraUi = false; }; ImGui::SameLine();
 			if (ImGui::Button("CloseMainUi")) { showUi = false; }; ImGui::SameLine();
 			ImGui::End();
 		}
@@ -681,6 +776,9 @@ namespace DivaHook::Components
 
 	void GLComponent::Initialize()
 	{
+		glewInit();
+		fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
+
 		std::ifstream f("pv_modules.csv");
 		if (f.good())
 		{
