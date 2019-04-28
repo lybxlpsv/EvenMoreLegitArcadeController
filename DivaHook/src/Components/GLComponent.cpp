@@ -254,6 +254,11 @@ namespace DivaHook::Components
 		glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
 	}
 
+	void drawFbo(GLuint fbo, GLint x, GLint y, GLint w, GLint h)
+	{
+
+	}
+
 	void writePbo(GLuint pbo)
 	{
 		glBindBufferARB(GL_PIXEL_PACK_BUFFER, pbo);
@@ -779,6 +784,76 @@ namespace DivaHook::Components
 		glewInit();
 		fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 
+		pdm->Initialize();
+		frm->Initialize();
+		tch->Initialize();
+		inp->Initialize();
+		cam->Initialize();
+
+		char dllname[] = "divahook1.dll";
+		size_t size = strlen(dllname) + 1;
+		wchar_t wtext[20];
+		size_t outSize;
+		mbstowcs_s(&outSize, wtext, size, dllname, size - 1);
+
+		hGetProcIDDLL = LoadLibrary(wtext);
+		FARPROC lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "StartReplay");
+		StartReplay = startReplay(lpfnGetProcessID);
+		lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "WriteReplay");
+		WriteReplay = writeReplay(lpfnGetProcessID);
+		lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "StopReplay");
+		StopReplay = stopReplay(lpfnGetProcessID);
+		lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "ReadReplay");
+		ReadReplay = readReplay(lpfnGetProcessID);
+		lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "InitReadReplay");
+		InitReadReplay = initReadReplay(lpfnGetProcessID);
+
+		DivaHook::FileSystem::ConfigFile resolutionConfig(MainModule::GetModuleDirectory(), RESOLUTION_CONFIG_FILE_NAME.c_str());
+		bool success = resolutionConfig.OpenRead();
+		if (!success)
+		{
+			printf("GLComponent: Unable to parse %s\n", RESOLUTION_CONFIG_FILE_NAME.c_str());
+		}
+
+		if (success) {
+			std::string trueString = "1";
+			std::string *value;
+			if (resolutionConfig.TryGetValue("fpsLimit", value))
+			{
+				fpsLimitSet = std::stoi(*value);
+			}
+			if (resolutionConfig.TryGetValue("MLAA", value))
+			{
+				morphologicalAA = std::stoi(*value);
+			}
+			if (resolutionConfig.TryGetValue("TAA", value))
+			{
+				temporalAA = std::stoi(*value);
+			}
+			if (resolutionConfig.TryGetValue("toonShaderWorkaround", value))
+			{
+				toonShader = std::stoi(*value);
+			}
+			if (resolutionConfig.TryGetValue("depthCopy", value))
+			{
+				if (*value == trueString)
+					copydepth = true;
+			}
+			if (resolutionConfig.TryGetValue("showFps", value))
+			{
+				if (*value == trueString)
+					showFps = true;
+			}
+		}
+
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.WantCaptureKeyboard == true;
+
+		ImGui_ImplWin32_Init(MainModule::DivaWindowHandle);
+		ImGui_ImplOpenGL2_Init();
+		ImGui::StyleColorsDark();
+
 		std::ifstream f("pv_modules.csv");
 		if (f.good())
 		{
@@ -955,65 +1030,8 @@ namespace DivaHook::Components
 
 			if ((initialized == false) && (timeBeforeInit < 0))
 			{
-				char dllname[] = "divahook1.dll";
-				size_t size = strlen(dllname) + 1;
-				wchar_t wtext[20];
-				size_t outSize;
-				mbstowcs_s(&outSize, wtext, size, dllname, size - 1);
-
-				hGetProcIDDLL = LoadLibrary(wtext);
-				FARPROC lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "StartReplay");
-				StartReplay = startReplay(lpfnGetProcessID);
-				lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "WriteReplay");
-				WriteReplay = writeReplay(lpfnGetProcessID);
-				lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "StopReplay");
-				StopReplay = stopReplay(lpfnGetProcessID);
-				lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "ReadReplay");
-				ReadReplay = readReplay(lpfnGetProcessID);
-				lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "InitReadReplay");
-				InitReadReplay = initReadReplay(lpfnGetProcessID);
-
-				pdm->Initialize();
-				frm->Initialize();
-				tch->Initialize();
-				inp->Initialize();
-				cam->Initialize();
-
 				*((int*)0x00F06290) = *((int*)0x0102C21C);
 				*((int*)0x00F0628C) = *((int*)0x0102C218);
-
-				DivaHook::FileSystem::ConfigFile resolutionConfig(MainModule::GetModuleDirectory(), RESOLUTION_CONFIG_FILE_NAME.c_str());
-				bool success = resolutionConfig.OpenRead();
-				if (!success)
-				{
-					printf("GLComponent: Unable to parse %s\n", RESOLUTION_CONFIG_FILE_NAME.c_str());
-				}
-
-				if (success) {
-					std::string trueString = "1";
-					std::string *value;
-					if (resolutionConfig.TryGetValue("fpsLimit", value))
-					{
-						fpsLimitSet = std::stoi(*value);
-					}
-					if (resolutionConfig.TryGetValue("MLAA", value))
-					{
-						morphologicalAA = std::stoi(*value);
-					}
-					if (resolutionConfig.TryGetValue("TAA", value))
-					{
-						temporalAA = std::stoi(*value);
-					}
-					if (resolutionConfig.TryGetValue("toonShaderWorkaround", value))
-					{
-						toonShader = std::stoi(*value);
-					}
-					if (resolutionConfig.TryGetValue("showFps", value))
-					{
-						if (*value == trueString)
-							showFps = true;
-					}
-				}
 
 				moduleEquip1 = pdm->customPlayerData->ModuleEquip[0];
 				moduleEquip2 = pdm->customPlayerData->ModuleEquip[1];
@@ -1029,13 +1047,7 @@ namespace DivaHook::Components
 				DWORD AddressToHook = (DWORD)GetProcAddress(GetModuleHandle(L"opengl32.dll"), "wglSwapBuffers");
 				owglSwapBuffers = Memory::JumpHook(AddressToHook, (DWORD)SwapTrampoline, 5);
 
-				ImGui::CreateContext();
-				ImGuiIO& io = ImGui::GetIO(); (void)io;
-				io.WantCaptureKeyboard == true;
-
-				ImGui_ImplWin32_Init(MainModule::DivaWindowHandle);
-				ImGui_ImplOpenGL2_Init();
-				ImGui::StyleColorsDark();
+				
 				printf("GLComponent::Initialize(): Initialized\n");
 				std::cout << &inp->inputState;
 				initialized = true;
@@ -1068,6 +1080,8 @@ namespace DivaHook::Components
 					}
 					WriteReplay(muspos, inp->inputState->GetAddr(), sizeof(InputState));
 				}
+
+				
 
 				if (!recordReplay)
 				{
