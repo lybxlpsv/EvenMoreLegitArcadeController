@@ -14,11 +14,12 @@ A collection of emulation components written in C++ for the purpose of operating
 This is still a work in progress program.
 
 ## Usage:
+* Copy paste all files into your Project Diva Arcade game folder.
+
 * Once per release patch your `diva.exe` using the `prepatch` program by either dropping it on the executable inside your file explorer 
 or manually passing it in as the first command line argument to the program.
 
-* Once the diva executable is appropriately patched start it like normal and *while* the diva process is running start `elac`.
-This has to be done every time diva is restarted.
+* Once the diva executable is appropriately patched, Start the game with diva_customres.bat.
 
 * Keyboard bindings can be changed inside the `keyconfig.ini` text file.
 Alternative input methods are not yet natively supported but using 3rd party software is of course an option.
